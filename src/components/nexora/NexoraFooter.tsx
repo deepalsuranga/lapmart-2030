@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Globe, Smartphone, Download } from "lucide-react";
 import { soundFX } from "@/utils/sound";
 
@@ -20,13 +21,17 @@ export default function NexoraFooter() {
               onClick={() => soundFX.click()}
               className="flex items-center gap-2.5 mb-4 group"
             >
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-rose-500 to-cyan-400 p-[2px]">
-                <div className="w-full h-full bg-[#090D1E] rounded-[6px] flex items-center justify-center font-black text-rose-400 text-sm">
-                  ✕
-                </div>
+              <div className="relative h-9 sm:h-10 flex items-center">
+                <Image
+                  src="/lapmart-logo.webp"
+                  alt="LapMart Official Brand Logo"
+                  width={185}
+                  height={40}
+                  className="h-9 sm:h-10 w-auto object-contain drop-shadow-[0_2px_12px_rgba(234,160,29,0.3)] group-hover:scale-105 transition-transform duration-300"
+                />
               </div>
-              <span className="text-xl font-black tracking-wider uppercase text-white group-hover:text-rose-400 transition-colors">
-                Lap<span className="text-rose-500">Mart</span> 2030
+              <span className="text-[9px] font-mono tracking-widest text-amber-400 font-bold bg-amber-400/10 border border-amber-400/30 px-1.5 py-0.5 rounded-full">
+                2030
               </span>
             </Link>
             <p className="text-slate-400 text-xs sm:text-sm leading-relaxed max-w-xs">

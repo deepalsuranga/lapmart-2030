@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useStore } from "@/context/StoreContext";
 import { LAPMART_BRANCHES } from "@/data/lapmart-data";
 import {
@@ -105,25 +106,25 @@ export default function NexoraHeader({
       {/* Primary Navigation Row (Exact Reference UI Hierarchy) */}
       <div className="max-w-7xl mx-auto px-4 sm:px-8 h-16 sm:h-[68px] flex items-center justify-between gap-4">
         
-        {/* Brand Logo */}
+        {/* Brand Logo (Official LapMart Logo) */}
         <Link
           href="/"
           onClick={() => soundFX.click()}
-          className="flex items-center gap-2.5 group shrink-0 select-none"
+          className="flex items-center gap-2 group shrink-0 select-none py-1"
         >
-          <div className="relative w-8 h-8 rounded-lg bg-gradient-to-tr from-rose-500 via-purple-600 to-cyan-400 p-[2px] shadow-lg shadow-rose-500/20 group-hover:scale-105 transition-transform">
-            <div className="w-full h-full bg-[#090D1E] rounded-[6px] flex items-center justify-center font-black text-rose-400 text-base">
-              ✕
-            </div>
+          <div className="relative h-8 sm:h-9 flex items-center">
+            <Image
+              src="/lapmart-logo.webp"
+              alt="LapMart Official Brand Logo"
+              width={180}
+              height={38}
+              priority
+              className="h-8 sm:h-9 w-auto object-contain drop-shadow-[0_2px_14px_rgba(234,160,29,0.35)] group-hover:scale-105 transition-transform duration-300"
+            />
           </div>
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-xl sm:text-2xl font-black tracking-wider text-white group-hover:text-rose-400 transition-colors uppercase">
-              Lap<span className="text-rose-500">Mart</span>
-            </span>
-            <span className="text-[10px] font-mono tracking-widest text-cyan-400 font-bold">
-              2030
-            </span>
-          </div>
+          <span className="text-[9px] font-mono tracking-widest text-amber-400 font-bold bg-amber-400/10 border border-amber-400/30 px-1.5 py-0.5 rounded-full hidden sm:inline-block">
+            2030
+          </span>
         </Link>
 
         {/* Center Capsule Search Input (Exact Look of Reference Image) */}

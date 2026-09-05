@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   LAPMART_BRANCHES,
   MASTER_HOTLINE,
@@ -11,7 +12,6 @@ import {
 } from "@/data/lapmart-data";
 import { useStore } from "@/context/StoreContext";
 import {
-  Laptop,
   MapPin,
   Phone,
   Mail,
@@ -65,17 +65,15 @@ export default function Footer() {
           
           {/* Column 1: Brand & Contact Info (5 Cols) */}
           <div className="lg:col-span-5 space-y-5">
-            <div className="flex items-center gap-2.5">
-              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 shadow-md border border-amber-300/40 text-white">
-                <Laptop className="w-5 h-5" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-2xl font-black tracking-tight text-white">
-                  Lap<span className="text-amber-500">Mart</span>
-                </span>
-                <span className="text-[10px] font-mono text-slate-400">
-                  DIRECT IMPORTERS OF QUALITY LAPTOPS
-                </span>
+            <div className="flex items-center gap-3">
+              <div className="relative h-10 sm:h-11 flex items-center">
+                <Image
+                  src="/lapmart-logo.webp"
+                  alt="LapMart Official Brand Logo"
+                  width={190}
+                  height={42}
+                  className="h-10 sm:h-11 w-auto object-contain drop-shadow-[0_2px_12px_rgba(234,160,29,0.3)]"
+                />
               </div>
             </div>
 

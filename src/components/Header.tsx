@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { LAPMART_BRANCHES, MASTER_HOTLINE } from "@/data/lapmart-data";
 import { useStore } from "@/context/StoreContext";
 import {
@@ -64,29 +65,25 @@ export default function Header() {
           
           {/* 1. BRAND MARK & BRANCH PICKER */}
           <div className="flex items-center gap-4 sm:gap-6 shrink-0">
-            {/* Logo */}
+            {/* Official LapMart Brand Logo */}
             <Link
               href="/"
               onClick={() => soundFX.click()}
-              className="flex items-center gap-2.5 group select-none"
+              className="flex items-center gap-2 group select-none py-1"
             >
-              <div className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 shadow-sm shadow-orange-500/25 border border-amber-300/40 group-hover:scale-105 transition-transform duration-300">
-                <div className="w-4 h-3 border-2 border-white rounded-[2px] flex flex-col items-center justify-end pb-0.5">
-                  <div className="w-1.5 h-0.5 bg-white rounded-full"></div>
-                </div>
-                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-cyan-400 rounded-full flex items-center justify-center text-[8px] font-black text-slate-950">
-                  ⚡
-                </div>
+              <div className="relative h-8 sm:h-9 flex items-center">
+                <Image
+                  src="/lapmart-logo.webp"
+                  alt="LapMart Official Brand Logo"
+                  width={180}
+                  height={38}
+                  priority
+                  className="h-8 sm:h-9 w-auto object-contain drop-shadow-[0_2px_8px_rgba(234,160,29,0.25)] group-hover:scale-105 transition-transform duration-300"
+                />
               </div>
-
-              <div className="flex items-center gap-1.5">
-                <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 group-hover:text-amber-600 transition-colors">
-                  Lap<span className="text-amber-500">Mart</span>
-                </span>
-                <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700 font-bold border border-amber-200/70">
-                  2030
-                </span>
-              </div>
+              <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700 font-bold border border-amber-200/70 hidden sm:inline-block">
+                2030
+              </span>
             </Link>
 
             {/* Clean Branch Indicator Pill */}

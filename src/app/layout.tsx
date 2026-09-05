@@ -15,6 +15,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "LapMart 2030 | Sri Lanka's Futuristic Laptop & Tech Store",
   description: "Experience the next dimension of laptop shopping in Sri Lanka with LapMart 2030. Brand new & premium used laptops, 7 islandwide branches, and live telemetry.",
+  icons: {
+    icon: "/lapmart-icon.png",
+    shortcut: "/favicon.ico",
+    apple: "/lapmart-icon.png",
+  },
 };
 
 export default function RootLayout({
