@@ -9,6 +9,7 @@ import NexoraCollections from "@/components/nexora/NexoraCollections";
 import NexoraRecommended from "@/components/nexora/NexoraRecommended";
 import NexoraMidSplit from "@/components/nexora/NexoraMidSplit";
 import NexoraRewardsPillars from "@/components/nexora/NexoraRewardsPillars";
+import NexoraProductGrid from "@/components/nexora/NexoraProductGrid";
 import NexoraReviews from "@/components/nexora/NexoraReviews";
 import NexoraNewsletter from "@/components/nexora/NexoraNewsletter";
 import NexoraFooter from "@/components/nexora/NexoraFooter";
@@ -50,7 +51,10 @@ export default function Home() {
           {/* 7. Rewards & Loyalty 4-Pillar Banner */}
           <NexoraRewardsPillars />
 
-          {/* 8. Customer Reviews ('What Shoppers Say') */}
+          {/* 8. Featured Hardware Product Grid (Filterable Rigs & Accessories) */}
+          <NexoraProductGrid />
+
+          {/* 9. Customer Reviews ('What Shoppers Say') */}
           <NexoraReviews />
 
           {/* 9. Newsletter Email Capture & Social Channels */}
