@@ -19,7 +19,6 @@ import BranchLocator from "@/components/BranchLocator";
 import QuickViewModal from "@/components/QuickViewModal";
 import CompareDrawer from "@/components/CompareDrawer";
 import CartDrawer from "@/components/CartDrawer";
-import WhatsAppFloat from "@/components/WhatsAppFloat";
 import CommandPalette from "@/components/CommandPalette";
 import LapMartChatbot from "@/components/chat/LapMartChatbot";
 
@@ -83,7 +82,6 @@ export default function Home() {
         <QuickViewModal />
         <CompareDrawer />
         <CartDrawer />
-        <WhatsAppFloat />
         <LapMartChatbot />
         <CommandPalette />
 
