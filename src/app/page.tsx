@@ -21,6 +21,7 @@ import CompareDrawer from "@/components/CompareDrawer";
 import CartDrawer from "@/components/CartDrawer";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
 import CommandPalette from "@/components/CommandPalette";
+import LapMartChatbot from "@/components/chat/LapMartChatbot";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("Home");
@@ -83,6 +84,7 @@ export default function Home() {
         <CompareDrawer />
         <CartDrawer />
         <WhatsAppFloat />
+        <LapMartChatbot />
         <CommandPalette />
 
       </div>
