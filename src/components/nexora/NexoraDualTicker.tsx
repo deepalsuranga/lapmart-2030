@@ -27,62 +27,62 @@ export default function NexoraDualTicker() {
   ];
 
   return (
-    <div className="relative w-full overflow-hidden py-6 sm:py-10 select-none bg-slate-900/5 my-4">
+    <section className="relative w-full overflow-hidden py-8 sm:py-14 select-none my-6 sm:my-10 bg-gradient-to-b from-transparent via-slate-100/40 to-transparent">
       {/* Container with overflow-hidden to crop angled ribbon edges */}
       <div className="relative w-full space-y-3 sm:space-y-4">
         
-        {/* TOP CORAL RIBBON (Slanted -1deg, moving left) */}
-        <div className="relative w-full -rotate-1 sm:-rotate-[1.2deg] scale-105 origin-center shadow-lg hover:shadow-xl transition-shadow z-20">
-          <div className="w-full bg-[#FF5A5F] py-2.5 sm:py-3.5 border-y border-rose-600/30 overflow-hidden flex items-center">
-            <div className="animate-marquee-left pause-on-hover flex items-center gap-6 sm:gap-10 text-slate-950 font-black text-sm sm:text-base tracking-tight cursor-default">
+        {/* TOP CORAL RIBBON (Slanted -1.2deg, moving left, bleeding past 100vw) */}
+        <div className="relative w-[112%] -left-[6%] -rotate-1 sm:-rotate-[1.2deg] shadow-lg hover:shadow-2xl transition-shadow z-20">
+          <div className="w-full bg-[#FF5A5F] py-3.5 sm:py-4.5 border-y border-rose-600/30 overflow-hidden flex items-center shadow-[0_4px_24px_rgba(255,90,95,0.25)]">
+            <div className="animate-marquee-left pause-on-hover flex items-center gap-8 sm:gap-12 text-slate-950 font-black text-sm sm:text-lg tracking-tight cursor-default">
               {/* Loop duplicated 3 times for completely seamless infinite wrap */}
               {[...topItems, ...topItems, ...topItems].map((item, idx) => (
-                <div key={idx} className="flex items-center gap-6 sm:gap-10 shrink-0">
+                <div key={idx} className="flex items-center gap-8 sm:gap-12 shrink-0">
                   {item.href ? (
                     <a
                       href={item.href}
                       onClick={() => soundFX.click()}
-                      className="flex items-center gap-2 hover:opacity-80 transition-opacity underline decoration-slate-950/40 hover:decoration-slate-950"
+                      className="flex items-center gap-2.5 hover:opacity-85 transition-opacity underline decoration-slate-950/40 hover:decoration-slate-950"
                     >
                       <span>{item.text}</span>
-                      <span className="text-base sm:text-lg">{item.icon}</span>
+                      <span className="text-lg sm:text-xl">{item.icon}</span>
                     </a>
                   ) : (
-                    <span className="flex items-center gap-2">
+                    <span className="flex items-center gap-2.5">
                       <span>{item.text}</span>
-                      <span className="text-base sm:text-lg">{item.icon}</span>
+                      <span className="text-lg sm:text-xl">{item.icon}</span>
                     </span>
                   )}
-                  <span className="w-2 h-2 rounded-full bg-slate-950/60 shrink-0"></span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-slate-950/70 shrink-0"></span>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* BOTTOM DARK RIBBON (Slanted +1deg, moving right) */}
-        <div className="relative w-full rotate-1 sm:rotate-[1deg] scale-105 origin-center shadow-2xl hover:shadow-cyan-950/20 transition-shadow z-10 -mt-2 sm:-mt-3">
-          <div className="w-full bg-[#080B16] py-2.5 sm:py-3.5 border-y border-white/10 overflow-hidden flex items-center">
-            <div className="animate-marquee-right pause-on-hover flex items-center gap-6 sm:gap-10 text-white font-black text-sm sm:text-base tracking-tight cursor-default">
+        {/* BOTTOM DARK RIBBON (Slanted +1deg, moving right, bleeding past 100vw) */}
+        <div className="relative w-[112%] -left-[6%] rotate-1 sm:rotate-[1deg] shadow-2xl hover:shadow-cyan-950/30 transition-shadow z-10 -mt-3 sm:-mt-4">
+          <div className="w-full bg-[#080B16] py-3.5 sm:py-4.5 border-y border-white/10 overflow-hidden flex items-center shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+            <div className="animate-marquee-right pause-on-hover flex items-center gap-8 sm:gap-12 text-white font-black text-sm sm:text-lg tracking-tight cursor-default">
               {/* Loop duplicated 3 times for completely seamless infinite wrap */}
               {[...bottomItems, ...bottomItems, ...bottomItems].map((item, idx) => (
-                <div key={idx} className="flex items-center gap-6 sm:gap-10 shrink-0">
+                <div key={idx} className="flex items-center gap-8 sm:gap-12 shrink-0">
                   {item.href ? (
                     <a
                       href={item.href}
                       onClick={() => soundFX.click()}
-                      className="flex items-center gap-2 text-white hover:text-amber-400 transition-colors underline decoration-white/30 hover:decoration-amber-400"
+                      className="flex items-center gap-2.5 text-white hover:text-amber-400 transition-colors underline decoration-white/30 hover:decoration-amber-400"
                     >
                       <span>{item.text}</span>
-                      <span className="text-base sm:text-lg">{item.icon}</span>
+                      <span className="text-lg sm:text-xl">{item.icon}</span>
                     </a>
                   ) : (
-                    <span className="flex items-center gap-2">
+                    <span className="flex items-center gap-2.5">
                       <span className="text-slate-100">{item.text}</span>
-                      <span className="text-base sm:text-lg">{item.icon}</span>
+                      <span className="text-lg sm:text-xl">{item.icon}</span>
                     </span>
                   )}
-                  <span className="w-2 h-2 rounded-full bg-amber-400/80 shrink-0 shadow-sm shadow-amber-400/40"></span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400/80 shrink-0 shadow-sm shadow-amber-400/40"></span>
                 </div>
               ))}
             </div>
@@ -90,6 +90,6 @@ export default function NexoraDualTicker() {
         </div>
 
       </div>
-    </div>
+    </section>
   );
 }

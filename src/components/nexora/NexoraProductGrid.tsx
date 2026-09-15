@@ -21,7 +21,6 @@ import {
   PhoneCall
 } from "lucide-react";
 import confetti from "canvas-confetti";
-import NexoraDualTicker from "@/components/nexora/NexoraDualTicker";
 
 type FilterTab = "ALL" | "GAMING" | "WORKSTATION" | "ULTRABOOK" | "USED" | "ACCESSORIES";
 
@@ -384,11 +383,6 @@ export default function NexoraProductGrid() {
             Chat WhatsApp
           </a>
         </div>
-      </div>
-
-      {/* Dual Infinite Sliding Marquee Ribbons (Inspired by Reference) */}
-      <div className="mt-8 sm:mt-12 -mx-4 sm:-mx-8">
-        <NexoraDualTicker />
       </div>
     </section>
   );
