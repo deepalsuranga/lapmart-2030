@@ -8,6 +8,7 @@ import { soundFX } from "@/utils/sound";
 import { useStore } from "@/context/StoreContext";
 import { LAPTOP_PRODUCTS } from "@/data/lapmart-data";
 import { LaptopProduct } from "@/types";
+import { getLaptopSlug } from "@/utils/slug";
 
 export default function NexoraRecommended() {
   const {
@@ -223,9 +224,16 @@ export default function NexoraRecommended() {
 
               {/* Product Info */}
               <div className="pt-2">
-                <h3 className="text-xs sm:text-sm font-bold text-slate-800 line-clamp-2 min-h-[38px] group-hover:text-rose-600 transition-colors leading-snug">
+                <Link
+                  href={`/product/${getLaptopSlug(product)}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    soundFX.click();
+                  }}
+                  className="text-xs sm:text-sm font-bold text-slate-800 line-clamp-2 min-h-[38px] hover:text-rose-600 transition-colors leading-snug block"
+                >
                   {product.name}
-                </h3>
+                </Link>
 
                 {/* Bottom Row: Price & Star Rating */}
                 <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">

@@ -37,6 +37,7 @@ export interface LaptopProduct {
     aiCompute: number; // 0 - 100
   };
   availableBranches: string[];
+  slug?: string;
 }
 
 export interface AccessoryProduct {
@@ -51,6 +52,35 @@ export interface AccessoryProduct {
   image: string;
   isSale?: boolean;
   specs: string;
+  slug?: string;
+}
+
+export interface FreeGiftItem {
+  id: string;
+  title: string;
+  subtitle: string;
+  retailValue: number;
+  image: string;
+  iconName: string;
+  badge: string;
+  description: string;
+  highlights: string[];
+}
+
+export interface HardwareUpgradeOption {
+  id: string;
+  label: string;
+  detail: string;
+  additionalPrice: number;
+  recommended?: boolean;
+  inStock?: boolean;
+}
+
+export interface BundleOffer {
+  id: string;
+  title: string;
+  discountPercentage: number;
+  accessoryIds: string[];
 }
 
 export interface Branch {
@@ -69,6 +99,12 @@ export interface CartItem {
   product: LaptopProduct | AccessoryProduct;
   quantity: number;
   selectedBranch?: string;
+  customConfiguration?: {
+    ram?: string;
+    storage?: string;
+    warranty?: string;
+    totalAdjustedPrice?: number;
+  };
 }
 
 export interface FilterState {

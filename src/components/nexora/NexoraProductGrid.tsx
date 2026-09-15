@@ -7,6 +7,7 @@ import { LaptopProduct, AccessoryProduct } from "@/types";
 import { LAPTOP_PRODUCTS, ACCESSORY_PRODUCTS, WHATSAPP_NUMBER } from "@/data/lapmart-data";
 import { useStore } from "@/context/StoreContext";
 import { soundFX } from "@/utils/sound";
+import { getLaptopSlug } from "@/utils/slug";
 import {
   Heart,
   Eye,
@@ -266,9 +267,22 @@ export default function NexoraProductGrid() {
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-xs sm:text-sm font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors">
-                    {item.name}
-                  </h3>
+                  {laptop ? (
+                    <Link
+                      href={`/product/${getLaptopSlug(laptop)}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        soundFX.click();
+                      }}
+                      className="text-xs sm:text-sm font-bold text-slate-800 line-clamp-2 leading-snug hover:text-blue-600 transition-colors block"
+                    >
+                      {item.name}
+                    </Link>
+                  ) : (
+                    <h3 className="text-xs sm:text-sm font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors">
+                      {item.name}
+                    </h3>
+                  )}
 
                   {/* Hardware Spec Chips for Laptops */}
                   {laptop && (

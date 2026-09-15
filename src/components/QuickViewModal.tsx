@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { useStore } from "@/context/StoreContext";
 import { LAPMART_BRANCHES, WHATSAPP_NUMBER } from "@/data/lapmart-data";
+import { getLaptopSlug } from "@/utils/slug";
 import {
   X,
   ShoppingCart,
@@ -16,10 +18,12 @@ import {
   Gauge,
   Battery,
   ShieldCheck,
-  Sparkles
+  Sparkles,
+  ArrowRight
 } from "lucide-react";
 import PriceTag from "@/components/PriceTag";
 import confetti from "canvas-confetti";
+import { soundFX } from "@/utils/sound";
 
 export default function QuickViewModal() {
   const {
@@ -324,6 +328,21 @@ export default function QuickViewModal() {
               >
                 <Heart className={`w-4 h-4 ${isFavorited ? "fill-white" : ""}`} />
               </button>
+            </div>
+
+            {/* Direct Link to Full Product Page */}
+            <div className="pt-2">
+              <Link
+                href={`/product/${getLaptopSlug(quickViewProduct)}`}
+                onClick={() => {
+                  soundFX.click();
+                  setQuickViewProduct(null);
+                }}
+                className="w-full py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
+              >
+                <span>View Full Page (Custom RAM/SSD Upgrades & Free 6-Piece VIP Pack)</span>
+                <ArrowRight className="w-3.5 h-3.5 text-rose-600" />
+              </Link>
             </div>
 
           </div>

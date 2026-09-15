@@ -105,30 +105,46 @@ export default function CartDrawer() {
                 </p>
               </div>
             ) : (
-              cart.map((item) => (
-                <div
-                  key={item.product.id}
-                  className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center gap-3.5"
-                >
-                  <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-900 shrink-0">
-                    <img
-                      src={item.product.image}
-                      alt={item.product.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+              cart.map((item, idx) => {
+                const itemPrice = item.customConfiguration?.totalAdjustedPrice ?? item.product.price;
+                return (
+                  <div
+                    key={`${item.product.id}-${idx}`}
+                    className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center gap-3.5"
+                  >
+                    <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-900 shrink-0">
+                      <img
+                        src={item.product.image}
+                        alt={item.product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
 
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-xs font-bold text-slate-900 truncate">
-                      {item.product.name}
-                    </h4>
-                    <span className="text-[10px] font-mono text-slate-400 block">
-                      SKU: {item.product.sku}
-                    </span>
-                    <span className="text-xs font-black text-amber-600 font-mono">
-                      <PriceTag amount={item.product.price} />
-                    </span>
-                  </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-xs font-bold text-slate-900 truncate">
+                        {item.product.name}
+                      </h4>
+                      <span className="text-[10px] font-mono text-slate-400 block">
+                        SKU: {item.product.sku}
+                      </span>
+                      {item.customConfiguration && (
+                        <div className="flex flex-wrap gap-1 my-1">
+                          {item.customConfiguration.ram && (
+                            <span className="text-[9px] font-mono bg-rose-50 text-rose-700 px-1.5 py-0.2 rounded border border-rose-200">
+                              {item.customConfiguration.ram}
+                            </span>
+                          )}
+                          {item.customConfiguration.storage && (
+                            <span className="text-[9px] font-mono bg-blue-50 text-blue-700 px-1.5 py-0.2 rounded border border-blue-200">
+                              {item.customConfiguration.storage}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      <span className="text-xs font-black text-amber-600 font-mono">
+                        <PriceTag amount={itemPrice} />
+                      </span>
+                    </div>
 
                   {/* Quantity & Delete */}
                   <div className="flex flex-col items-end gap-2">
@@ -161,8 +177,9 @@ export default function CartDrawer() {
                     </div>
                   </div>
                 </div>
-              ))
-            )}
+              );
+            })
+          )}
           </div>
 
           {/* Drawer Footer & Checkout */}

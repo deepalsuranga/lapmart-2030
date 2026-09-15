@@ -6,7 +6,16 @@ import { soundFX } from "@/utils/sound";
 
 interface StoreContextType {
   cart: CartItem[];
-  addToCart: (product: LaptopProduct | AccessoryProduct, quantity?: number) => void;
+  addToCart: (
+    product: LaptopProduct | AccessoryProduct,
+    quantity?: number,
+    customConfig?: {
+      ram?: string;
+      storage?: string;
+      warranty?: string;
+      totalAdjustedPrice?: number;
+    }
+  ) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, delta: number) => void;
   cartTotal: number;
@@ -137,18 +146,44 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const addToCart = (product: LaptopProduct | AccessoryProduct, quantity = 1) => {
+  const addToCart = (
+    product: LaptopProduct | AccessoryProduct,
+    quantity = 1,
+    customConfig?: {
+      ram?: string;
+      storage?: string;
+      warranty?: string;
+      totalAdjustedPrice?: number;
+    }
+  ) => {
     soundFX.success();
     setCart((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id);
-      if (existing) {
-        return prev.map((item) =>
-          item.product.id === product.id
+      // If item has custom config, treat each unique configuration as its own cart item
+      const existingIndex = prev.findIndex(
+        (item) =>
+          item.product.id === product.id &&
+          item.customConfiguration?.ram === customConfig?.ram &&
+          item.customConfiguration?.storage === customConfig?.storage &&
+          item.customConfiguration?.warranty === customConfig?.warranty
+      );
+
+      if (existingIndex > -1) {
+        return prev.map((item, idx) =>
+          idx === existingIndex
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       }
-      return [...prev, { product, quantity, selectedBranch }];
+
+      return [
+        ...prev,
+        {
+          product,
+          quantity,
+          selectedBranch,
+          customConfiguration: customConfig
+        }
+      ];
     });
     setIsCartOpen(true);
   };
@@ -174,7 +209,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   };
 
   const cartTotal = cart.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
+    (sum, item) =>
+      sum + (item.customConfiguration?.totalAdjustedPrice ?? item.product.price) * item.quantity,
     0
   );
 

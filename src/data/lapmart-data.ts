@@ -82,6 +82,7 @@ export const LAPTOP_PRODUCTS: LaptopProduct[] = [
   {
     id: "lap-acer-nitro",
     sku: "D001099",
+    slug: "acer-nitro-16-ai-edition-ryzen-7-rtx-4060-d001099",
     name: "Acer Nitro 16 AI Edition | Ryzen 7 7840HS | 16GB DDR5 | 1TB NVMe | RTX 4060 8GB | 16\" 165Hz QHD+",
     brand: "Acer",
     condition: "Brand New",
@@ -126,6 +127,7 @@ export const LAPTOP_PRODUCTS: LaptopProduct[] = [
   {
     id: "lap-thinkpad-t490",
     sku: "D001052",
+    slug: "lenovo-thinkpad-t490-touch-i5-8th-gen-d001052",
     name: "Lenovo ThinkPad T490 | i5 8th GEN | 8GB RAM | 256GB SSD | UHD Graphics | 14 inch | Touch | Used",
     brand: "Lenovo",
     condition: "Used",
@@ -169,6 +171,7 @@ export const LAPTOP_PRODUCTS: LaptopProduct[] = [
   {
     id: "lap-hp-zbook",
     sku: "D001038",
+    slug: "hp-zbook-14-g8-workstation-i5-10th-gen-d001038",
     name: "HP ZBOOK 14 G8 | i5 10th GEN | 8GB RAM | 256GB SSD | 14 FHD DISPLAY | Used",
     brand: "HP",
     condition: "Used",
@@ -211,6 +214,7 @@ export const LAPTOP_PRODUCTS: LaptopProduct[] = [
   {
     id: "lap-msi-thin-a15",
     sku: "D001041",
+    slug: "msi-thin-a15-b7uc-ryzen-7-rtx-3050-d001041",
     name: "MSI Thin A15 B7UC-653XAE | RYZEN 7 7735HS | 8GB RAM | 512GB SSD | RTX 3050 6GB | 15.6 inch | Brand New",
     brand: "MSI",
     condition: "Brand New",
@@ -254,6 +258,7 @@ export const LAPTOP_PRODUCTS: LaptopProduct[] = [
   {
     id: "lap-macbook-pro-16",
     sku: "D001027",
+    slug: "apple-macbook-pro-16-retina-core-i7-32gb-d001027",
     name: "MacBook Pro 16\" A2141 | Core i7 6-Core | 32GB RAM | 512GB SSD | 15.6 inch Retina | USED",
     brand: "Apple",
     condition: "Used",
@@ -296,6 +301,7 @@ export const LAPTOP_PRODUCTS: LaptopProduct[] = [
   {
     id: "lap-asus-rog-strix-g16",
     sku: "D001088",
+    slug: "asus-rog-strix-g16-core-i9-14900hx-rtx-4070-d001088",
     name: "ASUS ROG Strix G16 2030 Edition | Core i9 14900HX | 32GB DDR5 | 1TB Gen4 | RTX 4070 8GB | 240Hz Nebula",
     brand: "Asus",
     condition: "Brand New",
@@ -338,6 +344,7 @@ export const LAPTOP_PRODUCTS: LaptopProduct[] = [
   {
     id: "lap-dell-xps-15",
     sku: "D001077",
+    slug: "dell-xps-15-9530-3-5k-oled-touch-rtx-4050-d001077",
     name: "Dell XPS 15 9530 InfinityEdge | Core i7 13700H | 32GB RAM | 1TB NVMe | RTX 4050 | 3.5K OLED Touch",
     brand: "Dell",
     condition: "Brand New",
@@ -380,6 +387,7 @@ export const LAPTOP_PRODUCTS: LaptopProduct[] = [
   {
     id: "lap-hp-spectre-ai",
     sku: "D001064",
+    slug: "hp-spectre-x360-neural-ai-oled-touch-d001064",
     name: "HP Spectre x360 2-in-1 2030 Neural | Intel Core Ultra 7 155H AI | 16GB LPDDR5X | 1TB SSD | 2.8K OLED",
     brand: "HP",
     condition: "Brand New",

@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { useStore } from "@/context/StoreContext";
 import { LAPTOP_PRODUCTS, ACCESSORY_PRODUCTS, LAPMART_BRANCHES } from "@/data/lapmart-data";
+import { getLaptopSlug } from "@/utils/slug";
 import {
   Search,
   Laptop,
@@ -29,6 +31,7 @@ export default function CommandPalette() {
     formatLKR
   } = useStore();
 
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -206,8 +209,8 @@ export default function CommandPalette() {
                   key={p.id}
                   onClick={() => {
                     soundFX.click();
-                    setQuickViewProduct(p);
                     setIsCommandPaletteOpen(false);
+                    router.push(`/product/${getLaptopSlug(p)}`);
                   }}
                   className="p-2.5 rounded-xl hover:bg-slate-100 flex items-center justify-between gap-3 cursor-pointer transition-colors group"
                 >

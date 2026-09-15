@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useRef } from "react";
+import Link from "next/link";
 import { LaptopProduct } from "@/types";
 import { useStore } from "@/context/StoreContext";
 import { WHATSAPP_NUMBER } from "@/data/lapmart-data";
+import { getLaptopSlug } from "@/utils/slug";
 import {
   Eye,
   ShoppingCart,
@@ -248,16 +250,14 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Title */}
-        <h4
-          onClick={() => {
-            soundFX.click();
-            setQuickViewProduct(product);
-          }}
-          className="text-xs sm:text-sm font-bold text-slate-900 hover:text-amber-600 cursor-pointer line-clamp-2 leading-snug transition-colors"
+        <Link
+          href={`/product/${getLaptopSlug(product)}`}
+          onClick={() => soundFX.click()}
+          className="text-xs sm:text-sm font-bold text-slate-900 hover:text-amber-600 cursor-pointer line-clamp-2 leading-snug transition-colors block"
           title={product.name}
         >
           {product.name}
-        </h4>
+        </Link>
 
         {/* Spec bullet line */}
         <div className="text-[11px] text-slate-500 line-clamp-1 font-mono">
