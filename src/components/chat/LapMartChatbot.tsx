@@ -19,7 +19,9 @@ import {
   Zap,
   ArrowRight,
   MapPin,
-  Bot
+  Bot,
+  Laptop,
+  Wrench
 } from "lucide-react";
 
 type Language = "en" | "si" | "ta";
@@ -42,7 +44,8 @@ interface CustomerProfile {
 
 export default function LapMartChatbot() {
   const [isOpen, setIsOpen] = useState(false);
-  const [step, setStep] = useState<"LANG" | "PHONE" | "NEW_USER" | "CHAT">("LANG");
+  const [step, setStep] = useState<"LANG" | "HUB" | "PHONE" | "NEW_USER" | "CHAT">("LANG");
+  const [hubAction, setHubAction] = useState<string>("");
   
   // Language
   const [language, setLanguage] = useState<Language>("en");
@@ -116,10 +119,42 @@ export default function LapMartChatbot() {
     ]);
   };
 
-  // Step 1 -> Language Selection
+  // Step 1 -> Language Selection -> Transitions to Quick Hub
   const handleSelectLanguage = (lang: Language) => {
     soundFX.click();
     setLanguage(lang);
+    setStep("HUB");
+  };
+
+  const triggerPendingHubQuery = (actionKey: string, lang: Language) => {
+    let q = "";
+    if (actionKey === "STOCK") {
+      q = lang === "si" ? "දැනට තොගයේ ඇති හොඳම ලැප්ටොප් මොනවාද?" : lang === "ta" ? "தற்போது கையிருப்பில் உள்ள சிறந்த லேப்டாப்கள் எவை?" : "Can you show me the live laptop stock and current best deals?";
+    } else if (actionKey === "UPGRADE") {
+      q = lang === "si" ? "RAM / NVMe SSD / Battery upgrade මිල සහ විස්තර ලබා දෙන්න" : lang === "ta" ? "RAM / SSD / பேட்டரி மேம்படுத்தல் (Upgrade) விவரங்கள் வேண்டும்" : "I need information and prices for RAM, NVMe SSD, and battery upgrades";
+    } else if (actionKey === "BRANCHES") {
+      q = lang === "si" ? "දිවයින පුරා පිහිටි LapMart ශාඛා සහ ලිපිනයන් මොනවාද?" : lang === "ta" ? "LapMart இன் கிளைகள் மற்றும் தொடர்பு எண்கள் எவை?" : "What are your 7 islandwide showroom locations and pickup hours?";
+    }
+    if (q) {
+      setTimeout(() => {
+        handleSendMessage(q);
+      }, 500);
+    }
+  };
+
+  // Step 1.5 -> Select LapMart Quick Hub Option
+  const handleSelectHubOption = (actionKey: string) => {
+    soundFX.click();
+    setHubAction(actionKey);
+
+    // If customer session already exists, jump directly to chat with this query
+    if (customer && customer.phone) {
+      setStep("CHAT");
+      triggerPendingHubQuery(actionKey, language);
+      return;
+    }
+
+    // Otherwise proceed to phone verification to check customer memory
     setStep("PHONE");
   };
 
@@ -133,7 +168,7 @@ export default function LapMartChatbot() {
         language === "si"
           ? "කරුණාකර නිවැරදි දුරකථන අංකයක් ඇතුළත් කරන්න (උදා: 071 059 5548)"
           : language === "ta"
-          ? "சரியான தொலைபேசி எண்ணை உள்ளிடவும் (எ.கா: 071 059 5548)"
+          ? "සரியான தொலைபேசி எண்ணை உள்ளிடவும் (எ.கா: 071 059 5548)"
           : "Please enter a valid mobile number (e.g. 071 059 5548)"
       );
       return;
@@ -160,6 +195,9 @@ export default function LapMartChatbot() {
         localStorage.setItem("lapmart_customer_session", JSON.stringify(c));
         setStep("CHAT");
         initializeWelcomeChat(c.name, c.language, true);
+        if (hubAction) {
+          triggerPendingHubQuery(hubAction, c.language);
+        }
       } else {
         // New customer! Collect Name
         setStep("NEW_USER");
@@ -204,6 +242,9 @@ export default function LapMartChatbot() {
     localStorage.setItem("lapmart_customer_session", JSON.stringify(newCustomer));
     setStep("CHAT");
     initializeWelcomeChat(newCustomer.name, language, false);
+    if (hubAction) {
+      triggerPendingHubQuery(hubAction, language);
+    }
   };
 
   // Send Message in Chat
@@ -455,6 +496,137 @@ export default function LapMartChatbot() {
               </div>
             )}
 
+            {/* STEP 1.5: LAPMART QUICK HUB (Matches uploaded media_1789510059929.png) */}
+            {step === "HUB" && (
+              <div className="flex-1 flex flex-col justify-between animate-in fade-in duration-200">
+                {/* Hub Header Card */}
+                <div className="pb-3 border-b border-slate-200/80">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-full bg-[#00C26E] text-white flex items-center justify-center shadow-md shadow-emerald-500/25 shrink-0">
+                      <MessageSquare className="w-5 h-5 fill-white/20 stroke-[2.3]" />
+                    </div>
+                    <div>
+                      <h4 className="text-base font-black text-slate-900 tracking-tight flex items-center gap-1.5">
+                        <span>LapMart Quick Hub</span>
+                      </h4>
+                      <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-semibold mt-0.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>
+                          {language === "si"
+                            ? "විශේෂඥයින් සබැඳිව ඇත (සාමාන්‍ය පිළිතුරු: විනාඩි 2)"
+                            : language === "ta"
+                            ? "நிபுணர்கள் ஆன்லைனில் (பதில் நேரம்: 2 நிமி)"
+                            : "Specialists Online (Avg reply: 2m)"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Hub Action List (Pixel-matched with media_1789510059929.png) */}
+                <div className="py-4 space-y-2.5 flex-1 flex flex-col justify-center">
+                  {/* Option 1: Check Live Laptop Stock */}
+                  <button
+                    onClick={() => handleSelectHubOption("STOCK")}
+                    className="w-full p-4 rounded-2xl bg-white border border-slate-200/90 hover:border-amber-400 hover:shadow-md hover:scale-[1.01] active:scale-[0.99] text-left flex items-center justify-between group transition-all cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3.5">
+                      <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white transition-colors">
+                        <Laptop className="w-5 h-5 stroke-[2.2]" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors">
+                          {language === "si"
+                            ? "ලැප්ටොප් තොග පරීක්ෂා කරන්න"
+                            : language === "ta"
+                            ? "நேரலை லேப்டாப் கையிருப்பு"
+                            : "Check Live Laptop Stock"}
+                        </div>
+                        <div className="text-[11px] text-slate-400">
+                          {language === "si"
+                            ? "RTX Gaming & ThinkPads"
+                            : language === "ta"
+                            ? "விலைகள் மற்றும் சலுகைகள்"
+                            : "Brand New & Certified Used"}
+                        </div>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-amber-500 group-hover:translate-x-1 transition-transform" />
+                  </button>
+
+                  {/* Option 2: RAM / SSD / Battery Upgrade */}
+                  <button
+                    onClick={() => handleSelectHubOption("UPGRADE")}
+                    className="w-full p-4 rounded-2xl bg-white border border-slate-200/90 hover:border-cyan-500 hover:shadow-md hover:scale-[1.01] active:scale-[0.99] text-left flex items-center justify-between group transition-all cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3.5">
+                      <div className="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center group-hover:bg-cyan-500 group-hover:text-white transition-colors">
+                        <ShieldCheck className="w-5 h-5 stroke-[2.2]" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold text-slate-900 group-hover:text-cyan-600 transition-colors">
+                          {language === "si"
+                            ? "RAM / SSD / Battery Upgrade"
+                            : language === "ta"
+                            ? "RAM / SSD / பேட்டரி மேம்படுத்தல்"
+                            : "RAM / SSD / Battery Upgrade"}
+                        </div>
+                        <div className="text-[11px] text-slate-400">
+                          {language === "si"
+                            ? "පැය 2 ක් ඇතුළත ස්ථාපනය"
+                            : language === "ta"
+                            ? "உத்தரவாதத்துடன் கூடிய சேவை"
+                            : "Diagnostics Lab & Genuine Parts"}
+                        </div>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-cyan-500 group-hover:translate-x-1 transition-transform" />
+                  </button>
+
+                  {/* Option 3: Branch Location & Pickup */}
+                  <button
+                    onClick={() => handleSelectHubOption("BRANCHES")}
+                    className="w-full p-4 rounded-2xl bg-white border border-slate-200/90 hover:border-emerald-500 hover:shadow-md hover:scale-[1.01] active:scale-[0.99] text-left flex items-center justify-between group transition-all cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3.5">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <Phone className="w-5 h-5 stroke-[2.2]" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">
+                          {language === "si"
+                            ? "ශාඛා පිහිටීම සහ පැමිණ රැගෙන යාම"
+                            : language === "ta"
+                            ? "கிளை இடங்கள் & பிக்கப்"
+                            : "Branch Location & Pickup"}
+                        </div>
+                        <div className="text-[11px] text-slate-400">
+                          {language === "si"
+                            ? "දිවයින පුරා ශාඛා 7"
+                            : language === "ta"
+                            ? "7 நேரடி காட்சியறைகள்"
+                            : "7 Islandwide Showrooms"}
+                        </div>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-500 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </div>
+
+                {/* Hub Bottom Sub-bar */}
+                <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between text-[11px] font-mono text-slate-400">
+                  <a
+                    href={`tel:${MASTER_HOTLINE.replace(/\s+/g, "")}`}
+                    className="hover:text-emerald-600 hover:underline flex items-center gap-1"
+                  >
+                    <span>Direct Call:</span>
+                    <span className="font-bold text-slate-600">{MASTER_HOTLINE}</span>
+                  </a>
+                  <span>Sri Lanka GMT+5:30</span>
+                </div>
+              </div>
+            )}
+
             {/* STEP 2: PHONE NUMBER CHECK */}
             {step === "PHONE" && (
               <form
@@ -508,6 +680,17 @@ export default function LapMartChatbot() {
                         <ArrowRight className="w-4 h-4" />
                       </>
                     )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      soundFX.click();
+                      setStep("HUB");
+                    }}
+                    className="w-full py-1 text-xs font-semibold text-slate-400 hover:text-slate-700 transition-colors"
+                  >
+                    ← {language === "si" ? "ආපසු Quick Hub වෙත" : language === "ta" ? "Quick Hub க்கு திரும்பு" : "Back to Quick Hub"}
                   </button>
                 </div>
               </form>
@@ -694,21 +877,23 @@ export default function LapMartChatbot() {
 
           </div>
 
-          {/* Footer Sub-Bar */}
-          <div className="bg-slate-100/90 px-4 py-2 border-t border-slate-200/80 flex items-center justify-between text-[10px] text-slate-500 shrink-0">
-            <span className="flex items-center gap-1 font-medium">
-              <ShieldCheck className="w-3 h-3 text-emerald-600" />
-              <span>Verified LapMart Memory</span>
-            </span>
-            <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-emerald-700 hover:underline font-bold"
-            >
-              Direct WhatsApp Support
-            </a>
-          </div>
+          {/* Footer Sub-Bar (Hidden in HUB mode since HUB has its own pixel-matched footer) */}
+          {step !== "HUB" && (
+            <div className="bg-slate-100/90 px-4 py-2 border-t border-slate-200/80 flex items-center justify-between text-[10px] text-slate-500 shrink-0">
+              <span className="flex items-center gap-1 font-medium">
+                <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                <span>Verified LapMart Memory</span>
+              </span>
+              <a
+                href={`https://wa.me/${WHATSAPP_NUMBER}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-emerald-700 hover:underline font-bold"
+              >
+                Direct WhatsApp Support
+              </a>
+            </div>
+          )}
 
         </div>
       )}
