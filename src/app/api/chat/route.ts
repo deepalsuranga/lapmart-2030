@@ -194,7 +194,10 @@ export async function POST(request: NextRequest) {
             },
             generationConfig: {
               temperature: 0.7,
-              maxOutputTokens: 800
+              maxOutputTokens: 2048,
+              thinkingConfig: {
+                thinkingBudget: 0
+              }
             }
           })
         });
@@ -212,7 +215,7 @@ export async function POST(request: NextRequest) {
 
           return NextResponse.json({
             reply: replyText,
-            source: "gemini-2.5-flash",
+            source: "gemini-3.6-flash",
             language
           });
         } else {
