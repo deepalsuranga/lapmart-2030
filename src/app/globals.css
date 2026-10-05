@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #f8fafc;
   --foreground: #0f172a;
@@ -7,8 +9,19 @@
   --lapmart-orange-glow: rgba(255, 107, 0, 0.25);
   --lapmart-cyan: #06b6d4;
   --lapmart-cyan-glow: rgba(6, 182, 212, 0.25);
-  --card-bg: rgba(255, 255, 255, 0.82);
-  --card-border: rgba(226, 232, 240, 0.8);
+  --card-bg: rgba(255, 255, 255, 0.88);
+  --card-border: rgba(226, 232, 240, 0.9);
+}
+
+.dark {
+  --background: #070913;
+  --foreground: #f8fafc;
+  --card-bg: rgba(15, 23, 42, 0.88);
+  --card-border: rgba(255, 255, 255, 0.1);
+}
+
+html {
+  transition: background-color 0.35s cubic-bezier(0.4, 0, 0.2, 1), color 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
@@ -16,10 +29,17 @@ body {
   color: var(--foreground);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   overflow-x: hidden;
+  transition: background-color 0.35s cubic-bezier(0.4, 0, 0.2, 1), color 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   background-image: 
     radial-gradient(circle at 50% 0%, rgba(255, 107, 0, 0.04) 0%, transparent 50%),
     radial-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px);
   background-size: 100% 100%, 24px 24px;
+}
+
+.dark body {
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(255, 107, 0, 0.06) 0%, transparent 50%),
+    radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
 }
 
 /* 2030 Glassmorphism */
@@ -94,6 +114,41 @@ body {
 
 .animate-float {
   animation: floatGentle 5s ease-in-out infinite;
+}
+
+/* Animated Gold Logo Glow Aura */
+@keyframes goldAuraFloat {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+    opacity: 0.75;
+  }
+  33% {
+    transform: translate(12px, -5px) scale(1.16);
+    opacity: 0.95;
+  }
+  66% {
+    transform: translate(-8px, 4px) scale(0.94);
+    opacity: 0.7;
+  }
+}
+
+@keyframes goldPulseShimmer {
+  0%, 100% {
+    opacity: 0.5;
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: rotate(180deg) scale(1.15);
+  }
+}
+
+.animate-gold-aura {
+  animation: goldAuraFloat 6.5s ease-in-out infinite;
+}
+
+.animate-gold-shimmer {
+  animation: goldPulseShimmer 9s ease-in-out infinite;
 }
 
 @keyframes holographicShine {

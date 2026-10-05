@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
-import { normalizePhone } from "../customer/route";
+import { normalizePhone } from "@/lib/customer-utils";
 
 const MEMORY_DIR = path.join(process.cwd(), "secure_memory", "customers");
 

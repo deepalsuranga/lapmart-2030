@@ -54,6 +54,10 @@ interface StoreContextType {
   setSoundEnabled: (enabled: boolean) => void;
   toggleSound: () => void;
 
+  theme: "light" | "dark";
+  setTheme: (theme: "light" | "dark") => void;
+  toggleTheme: () => void;
+
   formatLKR: (amount: number) => string;
 }
 
@@ -77,11 +81,52 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [compareList, setCompareList] = useState<LaptopProduct[]>([]);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<LaptopProduct | null>(null);
-  const [selectedBranch, setSelectedBranch] = useState("bambalapitiya");
+  const [selectedBranch, setSelectedBranch] = useState("all");
   const [filters, setFilters] = useState<FilterState>(initialFilters);
   const [activeBrandTab, setActiveBrandTab] = useState("ALL LAPTOPS");
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [theme, setThemeState] = useState<"light" | "dark">("light");
+
+  // Synchronize theme with DOM on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("lapmart_theme");
+      if (saved === "dark") {
+        setThemeState("dark");
+        document.documentElement.classList.add("dark");
+        document.documentElement.setAttribute("data-theme", "dark");
+      } else {
+        setThemeState("light");
+        document.documentElement.classList.remove("dark");
+        document.documentElement.setAttribute("data-theme", "light");
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const setTheme = (newTheme: "light" | "dark") => {
+    setThemeState(newTheme);
+    try {
+      localStorage.setItem("lapmart_theme", newTheme);
+    } catch {
+      // ignore
+    }
+    if (newTheme === "dark") {
+      document.documentElement.classList.add("dark");
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      document.documentElement.setAttribute("data-theme", "light");
+    }
+  };
+
+  const toggleTheme = () => {
+    soundFX.switchTab();
+    const nextTheme = theme === "light" ? "dark" : "light";
+    setTheme(nextTheme);
+  };
 
   // Global Ctrl+K / Cmd+K listener
   useEffect(() => {
@@ -297,6 +342,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         soundEnabled,
         setSoundEnabled,
         toggleSound,
+        theme,
+        setTheme,
+        toggleTheme,
         formatLKR
       }}
     >

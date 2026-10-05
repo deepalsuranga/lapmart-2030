@@ -10,6 +10,8 @@ import { LAPTOP_PRODUCTS } from "@/data/lapmart-data";
 import { LaptopProduct } from "@/types";
 import { getLaptopSlug } from "@/utils/slug";
 
+import ScrollReveal from "@/components/ui/ScrollReveal";
+
 export default function NexoraRecommended() {
   const {
     wishlist,
@@ -89,14 +91,14 @@ export default function NexoraRecommended() {
     const parts = formatted.split(".");
     if (parts.length === 2) {
       return (
-        <span className="text-xs sm:text-sm font-black text-slate-900">
+        <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
           {parts[0]}
           <span className="text-[10px] font-normal text-slate-400">.{parts[1]}</span>
         </span>
       );
     }
     return (
-      <span className="text-xs sm:text-sm font-black text-slate-900">
+      <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
         {formatted}
       </span>
     );
@@ -105,50 +107,52 @@ export default function NexoraRecommended() {
   return (
     <section id="recommended" className="py-8 sm:py-12 max-w-7xl mx-auto px-4 sm:px-8 select-none">
       {/* Header Row: Title, 'See All' & Navigation Arrows */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-              Recommended For You
-            </h2>
-            <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[10px] font-bold border border-blue-100">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
-              Auto Drift Loop
-            </span>
+      <ScrollReveal animation="fade-up" duration={600}>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight transition-colors">
+                Recommended For You
+              </h2>
+              <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold border border-blue-100 dark:border-blue-800/50">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                Auto Drift Loop
+              </span>
+            </div>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5 transition-colors">
+              Top-rated machines calibrated for performance, reliability & value • Hover to pause
+            </p>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Top-rated machines calibrated for performance, reliability & value • Hover to pause
-          </p>
-        </div>
 
-        <div className="flex items-center gap-3">
-          <Link
-            href="/shop"
-            onClick={() => soundFX.click()}
-            className="text-xs sm:text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
-          >
-            See All
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/shop"
+              onClick={() => soundFX.click()}
+              className="text-xs sm:text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+            >
+              See All
+            </Link>
 
-          {/* Carousel Chevrons */}
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => handleManualScroll("left")}
-              className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 hover:text-slate-900 shadow-sm transition-all cursor-pointer active:scale-95"
-              aria-label="Previous"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => handleManualScroll("right")}
-              className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 hover:text-slate-900 shadow-sm transition-all cursor-pointer active:scale-95"
-              aria-label="Next"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
+            {/* Carousel Chevrons */}
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => handleManualScroll("left")}
+                className="w-8 h-8 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white shadow-sm transition-all cursor-pointer active:scale-95"
+                aria-label="Previous"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => handleManualScroll("right")}
+                className="w-8 h-8 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white shadow-sm transition-all cursor-pointer active:scale-95"
+                aria-label="Next"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </ScrollReveal>
 
       {/* CONTINUOUS SMOOTH AUTO-SLIDING INFINITY LOOP CAROUSEL */}
       <div
@@ -166,11 +170,11 @@ export default function NexoraRecommended() {
             <div
               key={`${product.id}-${index}`}
               onClick={(e) => handleQuickView(product, e)}
-              className="min-w-[230px] sm:min-w-[250px] max-w-[270px] bg-white rounded-3xl p-4 border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group cursor-pointer relative shrink-0"
+              className="min-w-[230px] sm:min-w-[250px] max-w-[270px] bg-white dark:bg-slate-900/90 rounded-3xl p-4 border border-slate-100 dark:border-slate-800 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group cursor-pointer relative shrink-0"
             >
               {/* Top Row: Category Pill & Wishlist Heart */}
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-black/5">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-black/5 dark:border-white/10">
                   {product.category}
                 </span>
 
@@ -182,8 +186,8 @@ export default function NexoraRecommended() {
                   }}
                   className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
                     isWishlisted
-                      ? "text-rose-500 bg-rose-50"
-                      : "text-slate-300 hover:text-rose-500 hover:bg-slate-50"
+                      ? "text-rose-500 bg-rose-50 dark:bg-rose-500/20"
+                      : "text-slate-300 hover:text-rose-500 hover:bg-slate-50 dark:hover:bg-slate-800"
                   }`}
                   aria-label="Wishlist"
                 >
@@ -194,7 +198,7 @@ export default function NexoraRecommended() {
               </div>
 
               {/* Realistic Studio Product Image (Clean 3D Surface with Soft Shadow) */}
-              <div className="relative w-full h-36 my-2 rounded-2xl overflow-hidden bg-gradient-to-b from-slate-50 to-slate-100/80 flex items-center justify-center p-2">
+              <div className="relative w-full h-36 my-2 rounded-2xl overflow-hidden bg-gradient-to-b from-slate-50 to-slate-100/80 dark:from-slate-800/60 dark:to-slate-900/80 flex items-center justify-center p-2">
                 <Image
                   src={product.image}
                   alt={product.name}
@@ -230,21 +234,21 @@ export default function NexoraRecommended() {
                     e.stopPropagation();
                     soundFX.click();
                   }}
-                  className="text-xs sm:text-sm font-bold text-slate-800 line-clamp-2 min-h-[38px] hover:text-rose-600 transition-colors leading-snug block"
+                  className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 line-clamp-2 min-h-[38px] hover:text-rose-600 dark:hover:text-rose-400 transition-colors leading-snug block"
                 >
                   {product.name}
                 </Link>
 
                 {/* Bottom Row: Price & Star Rating */}
-                <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+                <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                   <div className="flex flex-col">
                     <span className="text-[10px] text-slate-400 font-medium">LapMart Direct</span>
                     {renderFormattedPrice(product.price)}
                   </div>
 
-                  <div className="flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 shadow-xs">
+                  <div className="flex items-center gap-1 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-full border border-amber-200/60 dark:border-amber-800/40 shadow-xs">
                     <Star className="w-3 h-3 text-amber-500 fill-amber-400" />
-                    <span className="text-[11px] font-bold text-amber-900 font-mono">
+                    <span className="text-[11px] font-bold text-amber-900 dark:text-amber-300 font-mono">
                       {product.rating.toFixed(1)}
                     </span>
                   </div>

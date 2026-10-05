@@ -42,4 +42,5 @@ next-env.d.ts
 
 # secure customer memory files
 /secure_memory/
+/scratch/
 

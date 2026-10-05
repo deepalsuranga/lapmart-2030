@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
+import { normalizePhone } from "@/lib/customer-utils";
 
 const MEMORY_DIR = path.join(process.cwd(), "secure_memory", "customers");
 
@@ -10,15 +11,6 @@ function ensureMemoryDir() {
   if (!fs.existsSync(MEMORY_DIR)) {
     fs.mkdirSync(MEMORY_DIR, { recursive: true });
   }
-}
-
-// Clean and normalize Sri Lankan phone numbers: e.g. "+94 71 059 5548" -> "0710595548"
-export function normalizePhone(raw: string): string {
-  const digits = raw.replace(/\D/g, "");
-  if (digits.startsWith("94") && digits.length === 11) {
-    return "0" + digits.slice(2);
-  }
-  return digits;
 }
 
 // Search for customer file matching `${phone}_*.md`
@@ -52,6 +44,57 @@ function parseCustomerMarkdown(content: string) {
     notes = content.substring(notesIndex + 29, end).trim();
   }
 
+  // Extract chat interaction log
+  const messages: { id: string; role: "user" | "assistant" | "staff"; sender: string; text: string; time: string }[] = [];
+  if (logIndex !== -1) {
+    const logSection = content.substring(logIndex + 24).trim();
+    const lines = logSection.split(/\r?\n/);
+
+    let currentMsg: { id: string; role: "user" | "assistant" | "staff"; sender: string; text: string; time: string } | null = null;
+    let msgIdx = 0;
+
+    for (const line of lines) {
+      const match = line.match(/^-\s*\*\*\[([^\]]+)\]\s*([^*:]+)\*\*:\s*(.*)$/);
+      if (match) {
+        if (currentMsg) {
+          messages.push(currentMsg);
+        }
+
+        const time = match[1].trim();
+        const rawSender = match[2].trim().toLowerCase();
+        const initialText = match[3];
+
+        let role: "user" | "assistant" | "staff" = "user";
+        let sender = "Customer";
+        if (rawSender.includes("ai") || rawSender.includes("lapmart")) {
+          role = "assistant";
+          sender = "LapMart AI";
+        } else if (rawSender.includes("staff") || rawSender.includes("admin")) {
+          role = "staff";
+          sender = "LapMart Staff";
+        }
+
+        currentMsg = {
+          id: `msg-${msgIdx++}`,
+          role,
+          sender,
+          text: initialText,
+          time
+        };
+      } else if (currentMsg) {
+        currentMsg.text += "\n" + line;
+      }
+    }
+
+    if (currentMsg) {
+      messages.push(currentMsg);
+    }
+  }
+
+  messages.forEach((m) => {
+    m.text = m.text.trim();
+  });
+
   return {
     name: nameMatch ? nameMatch[1].trim() : "Valued Customer",
     phone: phoneMatch ? phoneMatch[1].trim() : "",
@@ -60,7 +103,8 @@ function parseCustomerMarkdown(content: string) {
     interests: interestsMatch
       ? interestsMatch[1].split(",").map((s) => s.trim()).filter(Boolean)
       : [],
-    memoryNotes: notes
+    memoryNotes: notes,
+    messages
   };
 }
 

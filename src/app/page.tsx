@@ -7,6 +7,7 @@ import NexoraHero from "@/components/nexora/NexoraHero";
 import NexoraCategoryBar from "@/components/nexora/NexoraCategoryBar";
 import NexoraCollections from "@/components/nexora/NexoraCollections";
 import NexoraRecommended from "@/components/nexora/NexoraRecommended";
+import NexoraCategorySections from "@/components/nexora/NexoraCategorySections";
 import NexoraMidSplit from "@/components/nexora/NexoraMidSplit";
 import NexoraRewardsPillars from "@/components/nexora/NexoraRewardsPillars";
 import NexoraProductGrid from "@/components/nexora/NexoraProductGrid";
@@ -21,14 +22,15 @@ import CompareDrawer from "@/components/CompareDrawer";
 import CartDrawer from "@/components/CartDrawer";
 import CommandPalette from "@/components/CommandPalette";
 import LapMartChatbot from "@/components/chat/LapMartChatbot";
+import ScrollReveal from "@/components/ui/ScrollReveal";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("Home");
 
   return (
     <StoreProvider>
-      <div className="relative min-h-screen flex flex-col bg-[#F8FAFC] text-slate-900 selection:bg-rose-500 selection:text-white font-sans antialiased overflow-x-hidden">
-        
+      <div className="relative min-h-screen flex flex-col bg-[#F8FAFC] dark:bg-[#070913] text-slate-900 dark:text-slate-100 selection:bg-rose-500 selection:text-white font-sans antialiased overflow-x-hidden transition-colors duration-300">
+
         {/* 1. Header (100% matched to reference top bar) */}
         <NexoraHeader activeTab={activeTab} setActiveTab={setActiveTab} />
 
@@ -45,6 +47,9 @@ export default function Home() {
 
           {/* 5. Recommended For You (Carousel / Product Grid) */}
           <NexoraRecommended />
+
+          {/* Dynamic Category-Wise 4x2 Product Grids with Shop Direct Links */}
+          <NexoraCategorySections />
 
           {/* 6. Mid-Page Split Section (Trending Now | Summer Refresh Sale | Flash Offers) */}
           <NexoraMidSplit />
@@ -65,13 +70,17 @@ export default function Home() {
           <NexoraNewsletter />
 
           {/* Diagnostic Lab Section (Integrated for #lab) */}
-          <div id="lab" className="border-t border-slate-200/80">
-            <DiagnosticLabSection />
+          <div id="lab" className="border-t border-slate-200/80 dark:border-slate-800 transition-colors">
+            <ScrollReveal animation="fade-up" duration={650}>
+              <DiagnosticLabSection />
+            </ScrollReveal>
           </div>
 
           {/* Showrooms & Physical Branches (Integrated for #showrooms) */}
-          <div id="showrooms" className="border-t border-slate-200/80">
-            <BranchLocator />
+          <div id="showrooms" className="border-t border-slate-200/80 dark:border-slate-800 transition-colors">
+            <ScrollReveal animation="fade-up" duration={650}>
+              <BranchLocator />
+            </ScrollReveal>
           </div>
         </main>
 

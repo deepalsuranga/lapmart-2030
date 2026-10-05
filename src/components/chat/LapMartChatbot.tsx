@@ -28,9 +28,10 @@ type Language = "en" | "si" | "ta";
 
 interface ChatMessage {
   id: string;
-  role: "user" | "assistant";
+  role: "user" | "assistant" | "staff";
   text: string;
   time: string;
+  sender?: string;
 }
 
 interface CustomerProfile {
@@ -75,23 +76,78 @@ export default function LapMartChatbot() {
     }
   }, [messages, isTyping, step]);
 
-  // Load cached customer from localStorage on mount
+  // Load customer previous chat history from secure memory
+  const loadCustomerHistory = async (phone: string, fallbackName?: string, fallbackLang?: Language) => {
+    try {
+      const res = await fetch(`/api/customer?phone=${encodeURIComponent(phone)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.exists && data.customer) {
+          const c: CustomerProfile = {
+            name: data.customer.name,
+            phone: data.customer.phone,
+            language: (data.customer.language as Language) || fallbackLang || "en",
+            uuid: data.customer.uuid,
+            interests: data.customer.interests,
+            memoryNotes: data.customer.memoryNotes
+          };
+          setCustomer(c);
+          setLanguage(c.language);
+          localStorage.setItem("lapmart_customer_session", JSON.stringify(c));
+
+          if (data.customer.messages && data.customer.messages.length > 0) {
+            setMessages(data.customer.messages);
+            return true;
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Error loading customer history:", err);
+    }
+
+    if (fallbackName) {
+      initializeWelcomeChat(fallbackName, fallbackLang || "en", true);
+    }
+    return false;
+  };
+
+  // Load cached customer from localStorage on mount and load their previous chat
   useEffect(() => {
     try {
       const saved = localStorage.getItem("lapmart_customer_session");
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed.phone && parsed.name) {
+        if (parsed.phone) {
           setCustomer(parsed);
           setLanguage(parsed.language || "en");
           setStep("CHAT");
-          initializeWelcomeChat(parsed.name, parsed.language || "en", true);
+          loadCustomerHistory(parsed.phone, parsed.name, parsed.language || "en");
         }
       }
     } catch {
       // ignore
     }
   }, []);
+
+  // Live sync of customer conversation while chat window is active
+  useEffect(() => {
+    if (!isOpen || step !== "CHAT" || !customer?.phone) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/customer?phone=${encodeURIComponent(customer.phone)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.customer?.messages && data.customer.messages.length > messages.length) {
+            setMessages(data.customer.messages);
+            soundFX.pop();
+          }
+        }
+      } catch {}
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [isOpen, step, customer?.phone, messages.length]);
 
   const initializeWelcomeChat = (name: string, lang: Language, isReturning = false) => {
     let welcome = "";
@@ -182,7 +238,7 @@ export default function LapMartChatbot() {
       const data = await res.json();
 
       if (data.exists && data.customer) {
-        // Customer exists! Welcome back
+        // Customer exists! Welcome back with previous messages
         const c: CustomerProfile = {
           name: data.customer.name,
           phone: data.customer.phone,
@@ -194,7 +250,13 @@ export default function LapMartChatbot() {
         setCustomer(c);
         localStorage.setItem("lapmart_customer_session", JSON.stringify(c));
         setStep("CHAT");
-        initializeWelcomeChat(c.name, c.language, true);
+
+        if (data.customer.messages && data.customer.messages.length > 0) {
+          setMessages(data.customer.messages);
+        } else {
+          initializeWelcomeChat(c.name, c.language, true);
+        }
+
         if (hubAction) {
           triggerPendingHubQuery(hubAction, c.language);
         }
@@ -775,28 +837,52 @@ export default function LapMartChatbot() {
                 {/* Message Stream */}
                 <div className="flex-1 overflow-y-auto space-y-3.5 pr-1 py-1">
                   {messages.map((m) => {
+                    const isStaff = m.role === "staff";
                     const isAi = m.role === "assistant";
+                    const isUser = m.role === "user";
+
                     return (
                       <div
                         key={m.id}
-                        className={`flex items-start gap-2 ${isAi ? "justify-start" : "justify-end"}`}
+                        className={`flex items-start gap-2 ${
+                          isUser ? "justify-end" : "justify-start"
+                        }`}
                       >
                         {isAi && (
                           <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 text-xs font-bold shadow-sm">
                             AI
                           </div>
                         )}
+                        {isStaff && (
+                          <div
+                            className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 text-slate-950 flex items-center justify-center shrink-0 text-xs font-black shadow-sm"
+                            title="LapMart Showroom Staff"
+                          >
+                            LM
+                          </div>
+                        )}
                         <div
-                          className={`max-w-[82%] rounded-2xl px-3.5 py-2.5 text-xs sm:text-[13px] leading-relaxed ${
-                            isAi
+                          className={`max-w-[84%] rounded-2xl px-3.5 py-2.5 text-xs sm:text-[13px] leading-relaxed ${
+                            isStaff
+                              ? "bg-amber-50/95 border border-amber-300/80 text-slate-900 shadow-sm"
+                              : isAi
                               ? "bg-white border border-slate-200/80 text-slate-800 shadow-sm whitespace-pre-wrap"
                               : "bg-[#0A1026] text-white shadow-md"
                           }`}
                         >
+                          {isStaff && (
+                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-amber-800 uppercase tracking-wider mb-1 font-mono">
+                              <span>LapMart Staff &bull; Showroom</span>
+                            </div>
+                          )}
                           <div dangerouslySetInnerHTML={{ __html: formatMessageText(m.text) }} />
                           <div
-                            className={`text-[9px] mt-1 text-right ${
-                              isAi ? "text-slate-400" : "text-slate-300/70"
+                            className={`text-[9px] mt-1 text-right font-mono ${
+                              isStaff
+                                ? "text-amber-800/60"
+                                : isAi
+                                ? "text-slate-400"
+                                : "text-slate-300/70"
                             }`}
                           >
                             {m.time}

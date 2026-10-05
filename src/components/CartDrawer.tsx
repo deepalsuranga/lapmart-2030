@@ -31,6 +31,10 @@ export default function CartDrawer() {
   } = useStore();
 
   const currentBranch = LAPMART_BRANCHES.find((b) => b.id === selectedBranch) || LAPMART_BRANCHES[2];
+  const branchLabel =
+    selectedBranch === "all"
+      ? "All Branches (Islandwide Fast Delivery / Any Showroom)"
+      : `LapMart ${currentBranch.city} (${currentBranch.displayPhone})`;
 
   const handleWhatsAppCheckout = () => {
     if (cart.length === 0) return;
@@ -42,7 +46,7 @@ export default function CartDrawer() {
       )
       .join("\n\n");
 
-    const message = `*LAPMART 2030 ONLINE ORDER INQUIRY*\n----------------------------------------\n*Preferred Branch:* LapMart ${currentBranch.city} (${currentBranch.displayPhone})\n\n*Ordered Items:*\n${itemsList}\n\n----------------------------------------\n*Estimated Total:* ${formatLKR(cartTotal)}\n*Delivery Method:* Islandwide Fast Courier / Showroom Pickup\n\nPlease confirm availability and dispatch instructions!`;
+    const message = `*LAPMART 2030 ONLINE ORDER INQUIRY*\n----------------------------------------\n*Preferred Branch:* ${branchLabel}\n\n*Ordered Items:*\n${itemsList}\n\n----------------------------------------\n*Estimated Total:* ${formatLKR(cartTotal)}\n*Delivery Method:* Islandwide Fast Courier / Showroom Pickup\n\nPlease confirm availability and dispatch instructions!`;
 
     try {
       confetti({

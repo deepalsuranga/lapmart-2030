@@ -260,9 +260,12 @@ export default function ProductClientPage({ product }: ProductClientPageProps) {
 
   // WhatsApp consultation
   const handleWhatsAppConsultation = () => {
-    soundFX.click();
-    const branchName = LAPMART_BRANCHES.find((b) => b.id === selectedBranch)?.city || "Kandy Flagship";
-    const text = `Hello LapMart! I am inquiring about the ${product.name} (SKU: ${product.sku}).
+    const branchName = selectedBranch === "all" 
+      ? "All Branches (Islandwide Delivery / Any Showroom)" 
+      : (LAPMART_BRANCHES.find((b) => b.id === selectedBranch)?.city || "Kandy Flagship");
+
+    const text = `Hello LapMart 2030 CyberHub! I would like to inquire about reserving ${product.name} (SKU: ${product.sku}).
+
 Configured Specs:
 • RAM: ${activeRamOption.label}
 • Storage: ${activeStorageOption.label}
@@ -538,28 +541,34 @@ Could you please confirm instant availability or prepare this reservation? Thank
               </div>
             </div>
 
-            {/* HARDWARE UP-SELL CONFIGURATOR */}
-            <div className="space-y-4 bg-white p-5 rounded-3xl border border-slate-200/90 shadow-sm">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            {/* STREAMLINED HARDWARE SPEC SELECTOR (CLEAN & COMPACT) */}
+            <div className="space-y-4 bg-white p-4 sm:p-5 rounded-3xl border border-slate-200/90 shadow-sm">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
                 <div className="flex items-center gap-2">
-                  <Sliders className="w-4 h-4 text-rose-600" />
-                  <h3 className="text-sm font-bold text-slate-900">Custom Upgrade Configurator</h3>
+                  <Sliders className="w-4 h-4 text-slate-700" />
+                  <h3 className="text-sm font-bold text-slate-900">Custom Upgrades</h3>
                 </div>
-                <span className="text-[11px] text-slate-500 font-mono">Real-time dynamic pricing</span>
+                <span className="text-[11px] text-slate-400 font-mono">Real-time dynamic pricing</span>
               </div>
 
               {/* 1. RAM Upgrade Selector */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
-                  <span>RAM Memory Configuration</span>
-                  <span className="text-[11px] font-mono text-slate-400">
-                    Active: <strong className="text-slate-800">{activeRamOption.label}</strong>
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-slate-800">Memory (RAM)</span>
+                  <span className="text-[11px] text-slate-500 font-mono">
+                    Selected: <strong className="text-slate-900">{activeRamOption.label.replace("Upgrade to ", "").replace(" (5600MHz)", "").replace(" (3200MHz)", "")}</strong>
                   </span>
-                </label>
+                </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   {ramOptions.map((opt) => {
                     const isSelected = opt.id === selectedRamId;
+                    const match = opt.label.match(/\b(8|16|32|64)GB\b/i);
+                    const shortName = match ? match[0] : opt.label.slice(0, 8);
+                    const deltaLabel = opt.additionalPrice === 0 
+                      ? "Incl." 
+                      : `+${opt.additionalPrice >= 1000 ? (opt.additionalPrice / 1000) + "k" : opt.additionalPrice}`;
+
                     return (
                       <button
                         key={opt.id}
@@ -568,27 +577,27 @@ Could you please confirm instant availability or prepare this reservation? Thank
                           soundFX.click();
                           setSelectedRamId(opt.id);
                         }}
-                        className={`p-3 rounded-2xl text-left border transition-all cursor-pointer flex flex-col justify-between ${
+                        className={`py-2 px-2.5 rounded-xl text-left border transition-all cursor-pointer flex items-center justify-between gap-1 ${
                           isSelected
-                            ? "bg-rose-50/80 border-rose-500 ring-2 ring-rose-200 shadow-xs"
-                            : "bg-slate-50/70 border-slate-200 hover:border-slate-300 hover:bg-slate-100/50"
+                            ? "bg-slate-900 text-white border-slate-900 shadow-xs"
+                            : "bg-slate-50/80 border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-white"
                         }`}
                       >
-                        <div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-bold text-slate-900">{opt.label}</span>
-                            {opt.recommended && (
-                              <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-amber-500 text-white">
-                                Popular
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-[10px] text-slate-500 mt-1 line-clamp-2">{opt.detail}</p>
+                        <div className="flex items-center gap-1 min-w-0">
+                          {isSelected && <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />}
+                          <span className={`text-xs font-bold ${isSelected ? "text-white" : "text-slate-900"}`}>
+                            {shortName}
+                          </span>
                         </div>
-
-                        <div className="mt-2 text-xs font-mono font-bold text-rose-600">
-                          {opt.additionalPrice === 0 ? "Included (+Rs. 0)" : `+ ${formatLKR(opt.additionalPrice)}`}
-                        </div>
+                        <span
+                          className={`text-[11px] font-mono shrink-0 ${
+                            isSelected
+                              ? opt.additionalPrice === 0 ? "text-slate-300" : "text-amber-300 font-bold"
+                              : opt.additionalPrice === 0 ? "text-slate-400" : "text-slate-600 font-semibold"
+                          }`}
+                        >
+                          {deltaLabel}
+                        </span>
                       </button>
                     );
                   })}
@@ -596,17 +605,23 @@ Could you please confirm instant availability or prepare this reservation? Thank
               </div>
 
               {/* 2. Storage Upgrade Selector */}
-              <div className="space-y-2 pt-2 border-t border-slate-100">
-                <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
-                  <span>NVMe Storage Configuration</span>
-                  <span className="text-[11px] font-mono text-slate-400">
-                    Active: <strong className="text-slate-800">{activeStorageOption.label}</strong>
+              <div className="space-y-1.5 pt-2 border-t border-slate-100">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-slate-800">Storage (NVMe SSD)</span>
+                  <span className="text-[11px] text-slate-500 font-mono">
+                    Selected: <strong className="text-slate-900">{activeStorageOption.label.replace("Upgrade to ", "").replace(" Massive Ultra-Fast NVMe Gen4", " Gen4 NVMe")}</strong>
                   </span>
-                </label>
+                </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   {storageOptions.map((opt) => {
                     const isSelected = opt.id === selectedStorageId;
+                    const match = opt.label.match(/\b(256GB|512GB|1TB|2TB|4TB)\b/i);
+                    const shortName = match ? match[0] : opt.label.slice(0, 8);
+                    const deltaLabel = opt.additionalPrice === 0 
+                      ? "Incl." 
+                      : `+${opt.additionalPrice >= 1000 ? (opt.additionalPrice / 1000) + "k" : opt.additionalPrice}`;
+
                     return (
                       <button
                         key={opt.id}
@@ -615,27 +630,27 @@ Could you please confirm instant availability or prepare this reservation? Thank
                           soundFX.click();
                           setSelectedStorageId(opt.id);
                         }}
-                        className={`p-3 rounded-2xl text-left border transition-all cursor-pointer flex flex-col justify-between ${
+                        className={`py-2 px-2.5 rounded-xl text-left border transition-all cursor-pointer flex items-center justify-between gap-1 ${
                           isSelected
-                            ? "bg-rose-50/80 border-rose-500 ring-2 ring-rose-200 shadow-xs"
-                            : "bg-slate-50/70 border-slate-200 hover:border-slate-300 hover:bg-slate-100/50"
+                            ? "bg-slate-900 text-white border-slate-900 shadow-xs"
+                            : "bg-slate-50/80 border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-white"
                         }`}
                       >
-                        <div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-bold text-slate-900">{opt.label}</span>
-                            {opt.recommended && (
-                              <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-cyan-500 text-white">
-                                Top Pick
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-[10px] text-slate-500 mt-1 line-clamp-2">{opt.detail}</p>
+                        <div className="flex items-center gap-1 min-w-0">
+                          {isSelected && <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />}
+                          <span className={`text-xs font-bold ${isSelected ? "text-white" : "text-slate-900"}`}>
+                            {shortName}
+                          </span>
                         </div>
-
-                        <div className="mt-2 text-xs font-mono font-bold text-rose-600">
-                          {opt.additionalPrice === 0 ? "Included (+Rs. 0)" : `+ ${formatLKR(opt.additionalPrice)}`}
-                        </div>
+                        <span
+                          className={`text-[11px] font-mono shrink-0 ${
+                            isSelected
+                              ? opt.additionalPrice === 0 ? "text-slate-300" : "text-amber-300 font-bold"
+                              : opt.additionalPrice === 0 ? "text-slate-400" : "text-slate-600 font-semibold"
+                          }`}
+                        >
+                          {deltaLabel}
+                        </span>
                       </button>
                     );
                   })}
@@ -643,17 +658,19 @@ Could you please confirm instant availability or prepare this reservation? Thank
               </div>
 
               {/* 3. Extended Protection Up-sell */}
-              <div className="space-y-2 pt-2 border-t border-slate-100">
-                <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
-                  <span>Warranty & Protection Plan</span>
-                  <span className="text-[11px] font-mono text-slate-400">
-                    Active: <strong className="text-slate-800">{activeWarrantyOption.label}</strong>
+              <div className="space-y-1.5 pt-2 border-t border-slate-100">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-slate-800">Warranty & Protection</span>
+                  <span className="text-[11px] text-slate-500 font-mono">
+                    Selected: <strong className="text-slate-900">{activeWarrantyOption.id === "warranty-care-plus" ? "3-Yr VIP Protection" : "Standard 2-Yr Warranty"}</strong>
                   </span>
-                </label>
+                </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {warrantyOptions.map((opt) => {
                     const isSelected = opt.id === selectedWarrantyId;
+                    const shortName = opt.id === "warranty-care-plus" ? "3-Yr VIP Care+" : "Standard 2-Yr";
+
                     return (
                       <button
                         key={opt.id}
@@ -662,27 +679,29 @@ Could you please confirm instant availability or prepare this reservation? Thank
                           soundFX.click();
                           setSelectedWarrantyId(opt.id);
                         }}
-                        className={`p-3 rounded-2xl text-left border transition-all cursor-pointer flex flex-col justify-between ${
+                        className={`py-2 px-3 rounded-xl text-left border transition-all cursor-pointer flex items-center justify-between gap-1.5 ${
                           isSelected
-                            ? "bg-rose-50/80 border-rose-500 ring-2 ring-rose-200 shadow-xs"
-                            : "bg-slate-50/70 border-slate-200 hover:border-slate-300 hover:bg-slate-100/50"
+                            ? "bg-slate-900 text-white border-slate-900 shadow-xs"
+                            : "bg-slate-50/80 border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-white"
                         }`}
                       >
-                        <div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-bold text-slate-900">{opt.label}</span>
-                            {opt.recommended && (
-                              <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-emerald-500 text-white">
-                                Recommended
-                              </span>
-                            )}
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            {isSelected && <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />}
+                            <span className={`text-xs font-bold truncate ${isSelected ? "text-white" : "text-slate-900"}`}>
+                              {shortName}
+                            </span>
                           </div>
-                          <p className="text-[10px] text-slate-500 mt-1 line-clamp-2">{opt.detail}</p>
                         </div>
-
-                        <div className="mt-2 text-xs font-mono font-bold text-rose-600">
-                          {opt.additionalPrice === 0 ? "Included Free" : `+ ${formatLKR(opt.additionalPrice)}`}
-                        </div>
+                        <span
+                          className={`text-[11px] font-mono shrink-0 ${
+                            isSelected
+                              ? opt.additionalPrice === 0 ? "text-slate-300" : "text-amber-300 font-bold"
+                              : opt.additionalPrice === 0 ? "text-emerald-600 font-bold" : "text-slate-600 font-semibold"
+                          }`}
+                        >
+                          {opt.additionalPrice === 0 ? "Free" : `+${formatLKR(opt.additionalPrice).replace(".00", "")}`}
+                        </span>
                       </button>
                     );
                   })}
@@ -710,6 +729,9 @@ Could you please confirm instant availability or prepare this reservation? Thank
                 }}
                 className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-800 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-rose-500 transition-all cursor-pointer"
               >
+                <option value="all">
+                  All Branches — 7 Showrooms & Islandwide Delivery
+                </option>
                 {LAPMART_BRANCHES.map((b) => (
                   <option key={b.id} value={b.id}>
                     {b.city} {b.isFlagship ? "★ Flagship CyberHub" : ""} — {b.hours} ({b.hotline})
@@ -721,7 +743,9 @@ Could you please confirm instant availability or prepare this reservation? Thank
                 <span>
                   Ready for collection at{" "}
                   <strong>
-                    {LAPMART_BRANCHES.find((b) => b.id === selectedBranch)?.city || "Kandy Flagship"}
+                    {selectedBranch === "all"
+                      ? "Any Branch / Islandwide"
+                      : (LAPMART_BRANCHES.find((b) => b.id === selectedBranch)?.city || "Kandy Flagship")}
                   </strong>{" "}
                   within 30 mins
                 </span>

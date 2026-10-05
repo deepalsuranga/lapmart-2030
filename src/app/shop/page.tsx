@@ -55,13 +55,17 @@ function ShopContent() {
   const [viewMode, setViewMode] = useState<"grid" | "compact">("grid");
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
-  // Read initial query params if present (e.g. ?brand=Acer or ?category=Gaming)
+  // Read initial query params if present (e.g. ?brand=Acer or ?category=Gaming or ?tab=accessories)
   useEffect(() => {
     const brandParam = searchParams.get("brand");
     const categoryParam = searchParams.get("category");
     const conditionParam = searchParams.get("condition");
     const queryParam = searchParams.get("q");
+    const tabParam = searchParams.get("tab");
 
+    if (tabParam === "accessories" || tabParam === "laptops" || tabParam === "all") {
+      setActiveTab(tabParam as "all" | "laptops" | "accessories");
+    }
     if (brandParam) {
       setFilters((prev) => ({ ...prev, brand: brandParam }));
       setActiveBrandTab(brandParam.toUpperCase());
@@ -567,6 +571,9 @@ function ShopContent() {
                   onChange={(e) => setSelectedBranch(e.target.value)}
                   className="w-full bg-white border border-amber-200 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-amber-500"
                 >
+                  <option value="all">
+                    All Branches (Islandwide Stock & Delivery)
+                  </option>
                   {LAPMART_BRANCHES.map((b) => (
                     <option key={b.id} value={b.id}>
                       {b.city} ({b.displayPhone}) {b.isFlagship ? "★ Flagship" : ""}

@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Mail } from "lucide-react";
 import { soundFX } from "@/utils/sound";
+import ScrollReveal from "@/components/ui/ScrollReveal";
 
 export default function NexoraNewsletter() {
   const [email, setEmail] = useState("");
@@ -22,18 +23,19 @@ export default function NexoraNewsletter() {
   return (
     <section className="py-6 max-w-7xl mx-auto px-4 sm:px-8">
       {/* Clean White Card with Subtle Border (Exact Screenshot Style) */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.04)] flex flex-col lg:flex-row items-center justify-between gap-6">
+      <ScrollReveal animation="fade-up" duration={600}>
+        <div className="bg-white dark:bg-[#0E1338]/90 rounded-3xl p-6 sm:p-8 border border-slate-100 dark:border-white/10 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.04)] flex flex-col lg:flex-row items-center justify-between gap-6">
         
         {/* Left: Email Icon & Text */}
         <div className="flex items-center gap-3.5 text-left w-full lg:w-auto">
-          <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-700 shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0">
             <Mail className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-base sm:text-lg font-bold text-slate-900">
+            <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
               Stay in the Loop
             </h3>
-            <p className="text-xs sm:text-sm text-slate-500">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
               Get exclusive hardware drops, new arrivals, and coupon codes.
             </p>
           </div>
@@ -42,7 +44,7 @@ export default function NexoraNewsletter() {
         {/* Center: Email Input & Coral Subscribe Button */}
         <form
           onSubmit={handleSubscribe}
-          className="w-full lg:max-w-md flex items-center bg-slate-50 rounded-full border border-slate-200 p-1.5 focus-within:ring-2 focus-within:ring-rose-500/20 focus-within:border-rose-400 transition-all"
+          className="w-full lg:max-w-md flex items-center bg-slate-50 dark:bg-slate-900/80 rounded-full border border-slate-200 dark:border-white/15 p-1.5 focus-within:ring-2 focus-within:ring-rose-500/20 focus-within:border-rose-400 transition-all"
         >
           <input
             type="email"
@@ -50,7 +52,7 @@ export default function NexoraNewsletter() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={isSubscribed}
-            className="flex-1 bg-transparent px-4 py-2 text-xs sm:text-sm text-slate-900 placeholder-slate-400 outline-none"
+            className="flex-1 bg-transparent px-4 py-2 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none"
           />
           <button
             type="submit"
@@ -62,7 +64,7 @@ export default function NexoraNewsletter() {
 
         {/* Right: Social Icon Links */}
         <div className="flex items-center gap-3 w-full lg:w-auto justify-start lg:justify-end">
-          <span className="text-xs font-bold text-slate-700 whitespace-nowrap">
+          <span className="text-xs font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">
             Follow Us
           </span>
           <div className="flex items-center gap-2">
@@ -72,7 +74,7 @@ export default function NexoraNewsletter() {
               target="_blank"
               rel="noreferrer"
               onClick={() => soundFX.click()}
-              className="w-8 h-8 rounded-full bg-slate-100 hover:bg-rose-500 hover:text-white text-slate-600 flex items-center justify-center transition-colors"
+              className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-rose-500 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors"
               aria-label="Instagram"
             >
               <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -86,7 +88,7 @@ export default function NexoraNewsletter() {
               target="_blank"
               rel="noreferrer"
               onClick={() => soundFX.click()}
-              className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-600 flex items-center justify-center transition-colors"
+              className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-900 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors"
               aria-label="TikTok"
             >
               <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
@@ -100,7 +102,7 @@ export default function NexoraNewsletter() {
               target="_blank"
               rel="noreferrer"
               onClick={() => soundFX.click()}
-              className="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-600 hover:text-white text-slate-600 flex items-center justify-center transition-colors"
+              className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-red-600 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors"
               aria-label="YouTube"
             >
               <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -114,7 +116,7 @@ export default function NexoraNewsletter() {
               target="_blank"
               rel="noreferrer"
               onClick={() => soundFX.click()}
-              className="w-8 h-8 rounded-full bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-600 flex items-center justify-center transition-colors"
+              className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors"
               aria-label="Facebook"
             >
               <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -128,7 +130,7 @@ export default function NexoraNewsletter() {
               target="_blank"
               rel="noreferrer"
               onClick={() => soundFX.click()}
-              className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-600 flex items-center justify-center transition-colors"
+              className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-900 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors"
               aria-label="Twitter/X"
             >
               <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
@@ -139,6 +141,7 @@ export default function NexoraNewsletter() {
         </div>
 
       </div>
+      </ScrollReveal>
     </section>
   );
 }

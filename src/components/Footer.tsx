@@ -66,13 +66,14 @@ export default function Footer() {
           {/* Column 1: Brand & Contact Info (5 Cols) */}
           <div className="lg:col-span-5 space-y-5">
             <div className="flex items-center gap-3">
-              <div className="relative h-10 sm:h-11 flex items-center">
+              <div className="relative w-[100px] h-[30px] flex items-center justify-center shrink-0 overflow-hidden">
                 <Image
-                  src="/lapmart-logo.webp"
+                  src="/lapmart-logo.svg"
                   alt="LapMart Official Brand Logo"
-                  width={190}
-                  height={42}
-                  className="h-10 sm:h-11 w-auto object-contain drop-shadow-[0_2px_12px_rgba(234,160,29,0.3)]"
+                  width={100}
+                  height={30}
+                  style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                  className="w-full h-full object-contain drop-shadow-[0_2px_10px_rgba(234,160,29,0.25)] group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
             </div>

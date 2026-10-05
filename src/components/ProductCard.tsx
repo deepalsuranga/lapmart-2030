@@ -122,63 +122,55 @@ export default function ProductCard({ product }: ProductCardProps) {
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="group relative flex flex-col justify-between rounded-3xl glass-panel bg-white/95 border border-slate-200/90 shadow-sm hover:shadow-2xl hover:border-amber-400/60 transition-all duration-300 overflow-hidden p-4 sm:p-5 text-left"
+      className="group relative flex flex-col justify-between rounded-3xl bg-white border border-slate-200/90 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-2xl hover:border-slate-300 transition-all duration-300 overflow-hidden p-4 sm:p-5 text-left"
     >
-      {/* Top Floating Badges */}
-      <div className="flex items-start justify-between z-10">
+      {/* Top Badges & Status */}
+      <div className="flex items-start justify-between z-10 gap-2 mb-1">
         <div className="flex flex-wrap items-center gap-1.5">
           {product.isSale && (
-            <span className="px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black text-[10px] tracking-tight shadow-sm uppercase">
-              SALE
+            <span className="px-2.5 py-0.5 rounded-full bg-rose-500 text-white font-extrabold text-[10px] tracking-wide uppercase shadow-sm">
+              SPECIAL OFFER
             </span>
           )}
-          {product.isHot && (
-            <span className="px-2 py-0.5 rounded-full bg-rose-500 text-white font-black text-[10px] tracking-tight shadow-sm uppercase">
-              HOT
+          {product.isHot && !product.isSale && (
+            <span className="px-2.5 py-0.5 rounded-full bg-amber-500 text-slate-950 font-extrabold text-[10px] tracking-wide uppercase shadow-sm">
+              HOT SELLER
             </span>
           )}
-          {matchScore > 0 && (
-            <span className="px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-900 border border-cyan-300 font-mono font-bold text-[10px]">
-              ★ {matchScore}% MATCH
-            </span>
-          )}
-        </div>
-
-        {/* Condition & SKU indicator */}
-        <div className="flex flex-col items-end gap-0.5">
           <span
-            className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded-full ${
+            className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
               product.condition === "Brand New"
-                ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
-                : "bg-blue-50 text-blue-800 border border-blue-200"
+                ? "bg-emerald-50 text-emerald-800 border border-emerald-200/80"
+                : "bg-blue-50 text-blue-800 border border-blue-200/80"
             }`}
           >
-            {product.condition === "Brand New" ? "BRAND NEW" : "CERTIFIED USED A+"}
+            {product.condition === "Brand New" ? "Factory Sealed" : "Certified Grade A+"}
           </span>
-          <span className="text-[10px] font-mono text-slate-400">SKU: {product.sku}</span>
         </div>
+
+        {/* SKU indicator */}
+        <span className="text-[10px] font-mono text-slate-400 shrink-0">SKU: {product.sku}</span>
       </div>
 
-      {/* Product Image Stage */}
+      {/* Product Image Stage — Clean Studio Backdrop */}
       <div
         onClick={() => {
           soundFX.click();
           setQuickViewProduct(product);
         }}
-        className="relative my-3 aspect-[4/3] rounded-2xl overflow-hidden bg-slate-950 flex items-center justify-center cursor-pointer group-hover:bg-slate-900 transition-colors shadow-inner"
+        className="relative my-3 aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-b from-slate-50 to-slate-100/70 border border-slate-100 flex items-center justify-center cursor-pointer p-4 group-hover:bg-slate-100/90 transition-colors"
       >
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
         />
 
         {/* Hover Quick-Action HUD Overlay */}
-        <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 p-2">
-          
+        <div className="absolute inset-0 bg-slate-950/25 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 p-2">
           <button
             onClick={handleAddToCartClick}
-            className="w-10 h-10 rounded-xl bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center shadow-lg transition-transform hover:scale-110 cursor-pointer"
+            className="w-10 h-10 rounded-xl bg-slate-900 hover:bg-slate-800 text-white flex items-center justify-center shadow-lg transition-transform hover:scale-110 cursor-pointer"
             title="Add to Cart"
           >
             <ShoppingCart className="w-4 h-4" />
@@ -191,7 +183,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               setQuickViewProduct(product);
             }}
             className="w-10 h-10 rounded-xl bg-white text-slate-800 hover:bg-slate-100 flex items-center justify-center shadow-lg transition-transform hover:scale-110 cursor-pointer"
-            title="Quick View Hologram"
+            title="Quick View Specs"
           >
             <Eye className="w-4 h-4 text-slate-700" />
           </button>
@@ -202,7 +194,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               addToCompare(product);
             }}
             className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 cursor-pointer ${
-              isCompared ? "bg-cyan-500 text-white" : "bg-white text-slate-800 hover:bg-slate-100"
+              isCompared ? "bg-blue-600 text-white" : "bg-white text-slate-800 hover:bg-slate-100"
             }`}
             title="Compare Specs"
           >
@@ -217,33 +209,29 @@ export default function ProductCard({ product }: ProductCardProps) {
             className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 cursor-pointer ${
               isFavorited ? "bg-rose-500 text-white" : "bg-white text-slate-800 hover:bg-slate-100"
             }`}
-            title="Wishlist"
+            title="Save to Wishlist"
           >
             <Heart className={`w-4 h-4 ${isFavorited ? "fill-white" : "text-slate-700"}`} />
           </button>
         </div>
 
-        {/* 2030 Telemetry Mini Bar on card */}
-        <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[9px] font-mono text-white/90 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-lg pointer-events-none">
-          <span className="flex items-center gap-1">
-            <Zap className="w-2.5 h-2.5 text-amber-400" />
-            AI: {product.scores.aiCompute}
+        {/* Free VIP Pack Badge on image bottom */}
+        <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[10px] font-semibold text-slate-700 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-lg border border-slate-200/80 shadow-sm pointer-events-none">
+          <span className="flex items-center gap-1 text-amber-700">
+            <Sparkles className="w-3 h-3 text-amber-500" />
+            + 6-Piece Free VIP Pack
           </span>
-          <span className="flex items-center gap-1">
-            <Gauge className="w-2.5 h-2.5 text-cyan-400" />
-            FPS: {product.scores.gaming}
-          </span>
-          <span className="text-emerald-400">Bat: {product.scores.batteryLife}%</span>
+          <span className="text-[9px] font-bold text-slate-400 uppercase">Worth Rs. 35,000</span>
         </div>
       </div>
 
       {/* Product Information */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-bold uppercase tracking-wider text-amber-600">
+          <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500">
             {product.brand}
           </span>
-          <span className="text-[10px] font-mono font-semibold text-emerald-600 flex items-center gap-1">
+          <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
             In Stock ({product.stockCount})
           </span>
@@ -253,15 +241,23 @@ export default function ProductCard({ product }: ProductCardProps) {
         <Link
           href={`/product/${getLaptopSlug(product)}`}
           onClick={() => soundFX.click()}
-          className="text-xs sm:text-sm font-bold text-slate-900 hover:text-amber-600 cursor-pointer line-clamp-2 leading-snug transition-colors block"
+          className="text-xs sm:text-sm font-bold text-slate-900 hover:text-blue-600 cursor-pointer line-clamp-2 leading-snug transition-colors block"
           title={product.name}
         >
           {product.name}
         </Link>
 
-        {/* Spec bullet line */}
-        <div className="text-[11px] text-slate-500 line-clamp-1 font-mono">
-          {product.processor} • {product.ram}
+        {/* Hardware Chips */}
+        <div className="flex flex-wrap gap-1 pt-1">
+          <span className="text-[10px] font-semibold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md truncate max-w-[170px]">
+            {product.processor}
+          </span>
+          <span className="text-[10px] font-semibold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md">
+            {product.ram}
+          </span>
+          <span className="text-[10px] font-semibold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md">
+            {product.storage}
+          </span>
         </div>
 
         {/* Pricing Block */}
@@ -275,7 +271,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                   decimalClassName="text-[0.7em] opacity-70 ml-0.5"
                 />
                 {savingsAmount > 0 && (
-                  <span className="text-[9px] font-mono font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded">
+                  <span className="text-[9px] font-bold text-rose-600 bg-rose-50 px-1.5 py-0.2 rounded border border-rose-100">
                     Save {formatLKR(savingsAmount).replace(".00", "")}
                   </span>
                 )}
@@ -284,19 +280,31 @@ export default function ProductCard({ product }: ProductCardProps) {
             <div>
               <PriceTag
                 amount={product.price}
-                className="text-base sm:text-lg font-black text-amber-600 font-mono tracking-tight"
+                className="text-base sm:text-lg font-black text-slate-900 font-mono tracking-tight"
                 decimalClassName="text-[0.6em] font-bold opacity-75 ml-0.5"
               />
             </div>
+            <div className="text-[10px] text-slate-400 mt-0.5">
+              Or ~Rs. {Math.round(product.price / 12).toLocaleString("en-LK")}/mo (12 mo EMI)
+            </div>
           </div>
 
-          <button
-            onClick={handleWhatsAppInquiry}
-            className="p-2 rounded-xl text-emerald-600 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-colors cursor-pointer"
-            title="Instant WhatsApp inquiry"
-          >
-            <MessageSquare className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={handleAddToCartClick}
+              className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white transition-colors cursor-pointer shadow-sm"
+              title="Add to cart"
+            >
+              <ShoppingCart className="w-4 h-4" />
+            </button>
+            <button
+              onClick={handleWhatsAppInquiry}
+              className="p-2 rounded-xl text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-colors cursor-pointer"
+              title="Instant WhatsApp inquiry"
+            >
+              <MessageSquare className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
