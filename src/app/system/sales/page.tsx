@@ -29,7 +29,8 @@ import {
   ShoppingBag,
   SlidersHorizontal,
   ChevronRight,
-  Award
+  Award,
+  RotateCcw
 } from "lucide-react";
 import { BranchInvoice, DailySalesSummary, BranchSalesStats } from "@/types/sales";
 import { soundFX } from "@/utils/sound";
@@ -46,6 +47,7 @@ export default function BranchWiseSalesPage() {
   const [recentFlashBranchId, setRecentFlashBranchId] = useState<string | null>(null);
   const [newInvoiceToast, setNewInvoiceToast] = useState<BranchInvoice | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isResetting, setIsResetting] = useState<boolean>(false);
 
   const toastTimerRef = useRef<NodeJS.Timeout | null>(null);
   const autoTickerRef = useRef<NodeJS.Timeout | null>(null);
@@ -63,6 +65,30 @@ export default function BranchWiseSalesPage() {
       console.error("Failed to load branch sales data:", err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Reset daily dashboard data to initial baseline
+  const resetDashboardData = async () => {
+    try {
+      setIsResetting(true);
+      const res = await fetch("/api/system/sales", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "reset_day" })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSummary(data.summary);
+        setInvoices(data.invoices || []);
+        if (soundEnabled) {
+          soundFX.click();
+        }
+      }
+    } catch (err) {
+      console.error("Failed to reset sales data:", err);
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -229,6 +255,17 @@ export default function BranchWiseSalesPage() {
             >
               <Zap className="w-3 h-3 text-slate-950" />
               <span>Instant Invoice</span>
+            </button>
+
+            {/* Reset Dashboard Data Trigger */}
+            <button
+              onClick={resetDashboardData}
+              disabled={isResetting}
+              className="px-3 py-1.5 rounded-lg bg-slate-200/90 dark:bg-slate-800 hover:bg-rose-500/15 dark:hover:bg-rose-500/20 text-slate-700 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 border border-slate-300/80 dark:border-slate-700 hover:border-rose-300 dark:hover:border-rose-500/40 font-bold text-xs font-mono flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 disabled:opacity-50"
+              title="Reset dashboard telemetry & invoices back to baseline"
+            >
+              <RotateCcw className={`w-3 h-3 ${isResetting ? "animate-spin" : ""}`} />
+              <span>{isResetting ? "Resetting..." : "Reset Data"}</span>
             </button>
 
             {/* Sound Toggle */}
