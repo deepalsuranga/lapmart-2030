@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://lapmart-v1.epixerp.com"),
   title: "LapMart 2030 | Sri Lanka's Futuristic Laptop & Tech Store",
   description: "Experience the next dimension of laptop shopping in Sri Lanka with LapMart 2030. Brand new & premium used laptops, 7 islandwide branches, and live telemetry.",
   icons: {
