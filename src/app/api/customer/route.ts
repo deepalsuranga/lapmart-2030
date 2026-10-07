@@ -129,7 +129,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const content = fs.readFileSync(found.filepath, "utf8");
+    const content = fs.readFileSync(/*turbopackIgnore: true*/ found.filepath, "utf8");
     const parsed = parseCustomerMarkdown(content);
 
     return NextResponse.json({
@@ -182,7 +182,7 @@ export async function POST(request: NextRequest) {
     let filepath = "";
 
     if (existing) {
-      const content = fs.readFileSync(existing.filepath, "utf8");
+      const content = fs.readFileSync(/*turbopackIgnore: true*/ existing.filepath, "utf8");
       const parsed = parseCustomerMarkdown(content);
       uuid = parsed.uuid;
       if (!name && parsed.name) finalName = parsed.name;
