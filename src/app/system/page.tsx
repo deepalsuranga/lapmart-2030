@@ -13,9 +13,13 @@ import {
   Sparkles,
   Layers,
   MapPin,
-  Cpu
+  Cpu,
+  TrendingUp,
+  DollarSign,
+  Store
 } from "lucide-react";
 import { CustomerChatProfile } from "@/app/api/system/chats/route";
+import { DailySalesSummary } from "@/types/sales";
 
 export default function SystemDashboardPage() {
   const [customers, setCustomers] = useState<CustomerChatProfile[]>([]);
@@ -24,17 +28,27 @@ export default function SystemDashboardPage() {
     totalMessages: 0,
     languages: { en: 0, si: 0, ta: 0 } as Record<string, number>
   });
+  const [salesSummary, setSalesSummary] = useState<DailySalesSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const loadData = async () => {
     try {
-      const res = await fetch("/api/system/chats");
-      if (res.ok) {
-        const data = await res.json();
+      const [chatRes, salesRes] = await Promise.all([
+        fetch("/api/system/chats"),
+        fetch("/api/system/sales")
+      ]);
+
+      if (chatRes.ok) {
+        const data = await chatRes.json();
         setCustomers(data.customers || []);
         if (data.stats) {
           setStats(data.stats);
         }
+      }
+
+      if (salesRes.ok) {
+        const salesData = await salesRes.json();
+        setSalesSummary(salesData.summary);
       }
     } catch (err) {
       console.error("Failed to load dashboard data:", err);
@@ -45,6 +59,8 @@ export default function SystemDashboardPage() {
 
   useEffect(() => {
     loadData();
+    const interval = setInterval(loadData, 8000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -60,25 +76,68 @@ export default function SystemDashboardPage() {
               <span>LapMart 2030 Unified Control Center</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-              Customer Operations & Live Chat Console
+              Owner Operations & Realtime Telemetry
             </h1>
             <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm max-w-2xl leading-relaxed">
-              Real-time monitoring of customer chat consultations across Sri Lanka, AI automated replies, and markdown memory profiles stored securely at Anuradhapura Hub.
+              Real-time monitoring of POS showroom sales across Sri Lanka, automated live incoming invoices, and customer AI chat memory profiles.
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/system/sales"
+              className="px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm font-mono shadow-[0_0_25px_rgba(16,185,129,0.3)] flex items-center gap-2 transition-all cursor-pointer active:scale-95"
+            >
+              <TrendingUp className="w-4 h-4" />
+              <span>Branch Sales (Live)</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-300 animate-ping" />
+            </Link>
+
             <Link
               href="/system/chat"
               className="px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 dark:from-cyan-500 dark:to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white dark:text-slate-950 font-bold text-xs sm:text-sm font-mono shadow-[0_0_25px_rgba(6,182,212,0.3)] flex items-center gap-2 transition-all cursor-pointer active:scale-95"
             >
               <MessageSquare className="w-4 h-4" />
-              <span>Enter Customer Chats</span>
+              <span>Customer Chats</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
       </div>
+
+      {/* Live Branch Sales Spotlight Banner */}
+      {salesSummary && (
+        <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-950/40 via-slate-900 to-teal-950/30 border border-emerald-500/30 shadow-lg relative overflow-hidden">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
+                <span className="text-xs font-mono font-bold uppercase text-emerald-400 tracking-wider">
+                  TODAY'S BRANCH NETWORK TURNOVER (LIVE)
+                </span>
+                <span className="text-xs text-slate-400 font-mono">• 7 Showrooms Active</span>
+              </div>
+              <div className="text-3xl sm:text-4xl font-black font-mono text-white tracking-tight">
+                Rs. {salesSummary.totalRevenue.toLocaleString()}{" "}
+                <span className="text-sm font-normal text-emerald-400">LKR</span>
+              </div>
+              <p className="text-xs text-slate-400 font-mono">
+                {salesSummary.totalInvoices} invoices generated today • {salesSummary.totalLaptopsSold} laptops dispatched • Top Showroom:{" "}
+                <strong className="text-white">{salesSummary.branches[0]?.branchName}</strong>
+              </p>
+            </div>
+
+            <Link
+              href="/system/sales"
+              className="px-6 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs sm:text-sm font-mono flex items-center gap-2 shadow-[0_0_30px_rgba(16,185,129,0.35)] shrink-0 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+            >
+              <Store className="w-4 h-4 text-slate-950" />
+              <span>Open Sales Telemetry</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">

@@ -17,7 +17,8 @@ import {
   Terminal,
   Sun,
   Moon,
-  Sparkles
+  Sparkles,
+  TrendingUp
 } from "lucide-react";
 import { SystemThemeProvider, useSystemTheme } from "@/context/SystemThemeContext";
 
@@ -106,6 +107,7 @@ function SystemLayoutInner({ children }: { children: React.ReactNode }) {
 
   const isChatActive = pathname === "/system/chat" || pathname.startsWith("/system/chat/");
   const isDashboardActive = pathname === "/system";
+  const isSalesActive = pathname === "/system/sales";
 
   return (
     <div className="h-screen w-screen bg-slate-100/70 dark:bg-[#060810] text-slate-900 dark:text-slate-100 flex flex-col md:flex-row overflow-hidden font-sans transition-colors duration-200 selection:bg-cyan-500 selection:text-black">
@@ -292,6 +294,38 @@ function SystemLayoutInner({ children }: { children: React.ReactNode }) {
                       {chatCount}
                     </span>
                   )}
+                </div>
+              )}
+            </Link>
+
+            {/* Branch Sales Telemetry (Live) */}
+            <Link
+              href="/system/sales"
+              title="Branch Sales Telemetry"
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all group ${
+                isSalesActive
+                  ? "bg-emerald-50 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-500/40 shadow-xs dark:shadow-[0_0_15px_rgba(16,185,129,0.2)]"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-900/80 border border-transparent"
+              } ${isCollapsed ? "justify-center px-2" : ""}`}
+            >
+              <div className="relative shrink-0">
+                <TrendingUp
+                  className={`w-4 h-4 ${
+                    isSalesActive
+                      ? "text-emerald-600 dark:text-emerald-400"
+                      : "text-slate-500 dark:text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors"
+                  }`}
+                />
+                {isCollapsed && (
+                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                )}
+              </div>
+              {!isCollapsed && (
+                <div className="flex-1 flex items-center justify-between overflow-hidden">
+                  <span className="truncate">Branch Sales (Live)</span>
+                  <span className="px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-500/30 text-[9px] font-mono font-bold animate-pulse shrink-0 ml-2">
+                    LIVE
+                  </span>
                 </div>
               )}
             </Link>
