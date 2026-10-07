@@ -2,38 +2,87 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import { normalizePhone } from "@/lib/customer-utils";
+import {
+  LAPTOP_PRODUCTS,
+  ACCESSORY_PRODUCTS,
+  LAPMART_BRANCHES,
+  MASTER_HOTLINE,
+  WHATSAPP_NUMBER
+} from "@/data/lapmart-data";
+import { FREE_GIFT_ITEMS } from "@/data/product-offers";
 
 const MEMORY_DIR = path.join(process.cwd(), "secure_memory", "customers");
 
-// LapMart Knowledge Base for Prompt Context
-const LAPMART_SYSTEM_PROMPT = `You are LapMart AI, the official intelligent hardware advisor and customer assistant for LapMart 2030 — Sri Lanka's leading computer & laptop distribution network.
+// Build structured, live product inventory text for Gemini AI reasoning
+function buildLiveCatalogContext(): string {
+  const laptopList = LAPTOP_PRODUCTS.map((lap) => {
+    const branches = lap.availableBranches.join(", ");
+    const discount = lap.originalPrice
+      ? ` (Regular: Rs. ${lap.originalPrice.toLocaleString()}, Save: Rs. ${(lap.originalPrice - lap.price).toLocaleString()})`
+      : "";
+    const conditionDetail =
+      lap.condition === "Brand New"
+        ? "Brand New Factory Sealed (2 Years Official Warranty)"
+        : `Certified Used Grade A+ (45-Point Lab Certified, ${lap.specs.warranty || "6-12 Months Warranty + 2 Yrs Free Service"})`;
+
+    return `• [SKU: ${lap.sku}] ${lap.name}
+  - Brand: ${lap.brand} | Category: ${lap.category} | Condition: ${conditionDetail}
+  - Price: Rs. ${lap.price.toLocaleString()} LKR${discount}
+  - Core Specs: CPU: ${lap.processor} | RAM: ${lap.ram} | Storage: ${lap.storage} | GPU: ${lap.graphics} | Display: ${lap.display}
+  - Battery / Weight: ${lap.specs.battery || "Long-life battery"} | ${lap.specs.weight || "Lightweight"}
+  - Operating System: ${lap.specs.os || "Windows 11 Genuine"}
+  - Stock: ${lap.inStock ? `In Stock (${lap.stockCount} units available)` : "Out of stock / Pre-order"} | Showrooms: ${branches}
+  - Product URL: https://lapmart-v1.epixerp.com/product/${lap.slug}`;
+  }).join("\n\n");
+
+  const accessoryList = ACCESSORY_PRODUCTS.map((acc) => {
+    return `• [SKU: ${acc.sku}] ${acc.name} - Rs. ${acc.price.toLocaleString()} LKR (${acc.specs}) - Stock: ${acc.inStock ? "In Stock" : "Out of stock"}`;
+  }).join("\n");
+
+  const giftList = FREE_GIFT_ITEMS.map((g) => {
+    return `• ${g.title} (Retail Value: Rs. ${g.retailValue.toLocaleString()}) - ${g.subtitle}`;
+  }).join("\n");
+
+  const branchList = LAPMART_BRANCHES.map((b) => {
+    return `• ${b.city}${b.isFlagship ? " (Flagship CyberHub)" : ""}: ${b.address} | Phone: ${b.displayPhone} | Hours: ${b.hours}`;
+  }).join("\n");
+
+  return `=== LAPMART 2030 LIVE PRODUCT INVENTORY (${LAPTOP_PRODUCTS.length} LAPTOPS IN STOCK) ===
+${laptopList}
+
+=== ACCESSORIES & PERIPHERALS ===
+${accessoryList}
+
+=== COMPLIMENTARY 6-PIECE VIP GIFT PACK (FREE WITH EVERY LAPTOP PURCHASE - VALUE RS. 35,000) ===
+${giftList}
+
+=== 7 PHYSICAL SHOWROOMS IN SRI LANKA ===
+${branchList}
+Hotline: ${MASTER_HOTLINE} | WhatsApp: +${WHATSAPP_NUMBER}`;
+}
+
+// Base system prompt instructions
+const LAPMART_SYSTEM_PROMPT = `You are LapMart AI, the official intelligent hardware advisor and sales specialist for LapMart 2030 — Sri Lanka's premier authorized laptop & computer distribution network.
 
 CRITICAL IDENTITY DIRECTIVE:
-If anyone asks "Who are you?", "What is your name?", or anything similar in any language, ALWAYS clearly state:
+If anyone asks "Who are you?", "What is your name?", or similar in any language, ALWAYS clearly state:
 "I am LapMart AI, your personal hardware advisor at LapMart 2030."
 
-STORE DETAILS & POLICIES:
-- Branches: 7 physical showrooms across Sri Lanka:
-  1. Anuradhapura (Main Hub): 488/11, Maithripala Senanayake Mawatha, New Bus Stand.
-  2. Kandy Flagship (CyberHub): Peradeniya Road, Kandy.
-  3. Colombo (Bambalapitiya): Unity Plaza Commercial Complex, Galle Road.
-  4. Kurunegala: No. 42, Colombo Road.
-  5. Colombo (Borella): No. 18, D.S. Senanayake Mawatha.
-  6. Kandy (City Center): No. 65, Dalada Veediya.
-  7. Polonnaruwa: Main Street, Kaduruwela.
-- Hotline: 071 059 5548 / 076 140 7320
-- WhatsApp: +94 71 059 5548
-- Products: Factory sealed Brand New laptops (Acer Nitro, ASUS ROG, HP, Dell XPS, MacBook) and Certified Used Grade A+ Business Workstations (Lenovo ThinkPad T490, HP ZBook).
-- Warranty: 2 Years on Brand New; 6-12 Months on Certified Used + 2 Years free service.
-- 45-Point Hardware Diagnostics Lab: Barcode certificate verifying thermals, battery health (85%+), SSD health, display uniformity.
-- Delivery: Islandwide express courier within 24-48 hours.
-- Currency: Always quote prices in Sri Lankan Rupees (Rs. / LKR).
+PRODUCT KNOWLEDGE & ACCURACY DIRECTIVES:
+1. ALWAYS reference and quote the EXACT real laptops, SKUs, specifications, and prices from the LIVE PRODUCT INVENTORY below.
+2. Prices must ALWAYS be quoted in Sri Lankan Rupees (Rs. / LKR).
+3. Distinguish clearly between "Brand New Factory Sealed" (2 Years Official Warranty) and "Certified Used Grade A+" (45-Point Hardware Diagnostics Lab certified, 85%+ battery health, 6-12 Months Hardware Warranty + 2 Years Free Service).
+4. Always inform customers about the FREE 6-Piece VIP Gift Pack (Retail Value Rs. 35,000) included with every laptop (CyberArmor Backpack, Silent Mouse, Silicone Shield, Screen Care, etc.).
+5. Provide direct clickable product page links (e.g. https://lapmart-v1.epixerp.com/product/[slug]) whenever discussing specific laptops.
+6. When recommending for specific budgets (e.g. under 150k, under 250k, 300k+) or use-cases (Gaming, Engineering/CAD, Software Dev, Graphic Design, Daily Study), select the best exact models from our inventory.
+7. Mention branch availability (7 showrooms: Anuradhapura, Kandy CyberHub, Colombo Unity Plaza, Kurunegala, Borella, Polonnaruwa, Kandy City) and Islandwide 24-48h courier delivery.
+8. If a requested model is not in stock, suggest the closest matching model from our inventory or offer to connect with our procurement team on WhatsApp (+94 71 059 5548).
 
 LANGUAGE BEHAVIOR:
-- If the customer's selected language is English: Respond in fluent, polite, consultative English.
-- If the customer's selected language is Sinhala (si): Respond naturally in fluent Sinhala (සිංහල).
-- If the customer's selected language is Tamil (ta): Respond naturally in fluent Tamil (தமிழ்).
-- Keep responses concise, friendly, and formatted with bullet points for easy reading on mobile devices. Always offer to connect with showroom technicians on WhatsApp when they want to reserve a machine.`;
+- English: Professional, consultative, tech-savvy, helpful.
+- Sinhala (si): Natural, polite, fluent Sinhala (සිංහල). Translate explanations while preserving exact technical specs and prices (e.g., "රු. 385,000").
+- Tamil (ta): Natural, polite, fluent Tamil (தமிழ்). Translate explanations while preserving exact technical specs and prices.
+- Format with clean markdown bullet points for easy mobile reading. Always offer WhatsApp reservation (+94 71 059 5548).`;
 
 // Fallback response engine if Gemini API Key is missing or offline
 function generateFallbackResponse(
@@ -53,55 +102,49 @@ function generateFallbackResponse(
     q.includes("neenga yaar")
   ) {
     if (lang === "si") {
-      return `මම **LapMart AI**, ලැප්මාර්ට් ආයතනයේ (LapMart 2030) නිල AI සහායකයා! ${customerName ? customerName + " මහත්මයා/මහත්මිය," : ""} ඔබට අවශ්‍ය ලැප්ටොප් පරිගණක, මිල ගණන්, වගකීම් සහ අලුත්වැඩියා විස්තර ලබාදීමට මම සූදානම්. අද මට ඔබට උදවු කළ හැක්කේ කෙසේද?`;
+      return `මම **LapMart AI**, ලැප්මාර්ට් ආයතනයේ (LapMart 2030) නිල AI සහායකයා! ${customerName ? customerName + " මහත්මයා/මහත්මිය," : ""} ඔබට අප සතු සියලුම Brand New සහ Certified Used ලැප්ටොප් පරිගණක, මිල ගණන්, පිරිවිතර (Specs), වගකීම් සහ ශාඛා විස්තර ලබාදීමට මම සූදානම්. අද ඔබට අවශ්‍ය තොරතුර කුමක්ද?`;
     }
     if (lang === "ta") {
-      return `நான் **LapMart AI**, LapMart 2030 இன் அதிகாரப்பூர்வ AI உதவியாளர்! ${customerName ? customerName + " அவர்களே," : ""} சிறந்த மடிக்கணினிகள் (Laptops), விலைகள் மற்றும் உத்தரவாத விவரங்களை அறிய நான் உதவ முடியும். உங்களுக்கு எவ்வாறு உதவலாம்?`;
+      return `நான் **LapMart AI**, LapMart 2030 இன் அதிகாரப்பூர்வ AI உதவியாளர்! ${customerName ? customerName + " அவர்களே," : ""} மடிக்கணினிகள் (Laptops), விலைகள் மற்றும் உத்தரவாத விவரங்களை அறிய நான் உதவ முடியும். உங்களுக்கு எவ்வாறு உதவலாம்?`;
     }
-    return `I am **LapMart AI**, your personal hardware advisor at LapMart 2030! ${customerName ? customerName + ", " : ""}I can assist you with laptop recommendations, custom RAM/NVMe upgrades, branch locations, and pricing in Sri Lankan Rupees. How can I help you today?`;
+    return `I am **LapMart AI**, your personal hardware advisor at LapMart 2030! ${customerName ? customerName + ", " : ""}I have complete access to our catalog of ${LAPTOP_PRODUCTS.length} laptops, custom RAM/NVMe upgrades, branch inventories, and Sri Lankan Rupee pricing. How can I assist you today?`;
   }
 
-  // Gaming
-  if (q.includes("gaming") || q.includes("rtx") || q.includes("graphic")) {
-    if (lang === "si") {
-      return `🎮 **LapMart Gaming Rigs:**\n\n1. **Acer Nitro 16 AI** - AMD Ryzen 7 8845HS, 16GB DDR5, 1TB NVMe, RTX 4060 8GB (Rs. 385,000)\n2. **MSI Thin A15** - Ryzen 5 7535HS, 16GB DDR5, RTX 3050 (Rs. 248,000)\n3. **ASUS ROG Strix G16** - i7 14th Gen, RTX 4070 (Rs. 465,000)\n\nසියලුම Gaming පරිගණක සඳහා වසර 2 ක නිල වගකීමක් හිමිවේ. ඔබට කැමති මොඩලය කුමක්ද?`;
-    }
-    if (lang === "ta") {
-      return `🎮 **LapMart கேமிங் லேப்டாப்கள்:**\n\n1. **Acer Nitro 16 AI** - Ryzen 7, RTX 4060 8GB (ரூ. 385,000)\n2. **MSI Thin A15** - RTX 3050 (ரூ. 248,000)\n3. **ASUS ROG Strix G16** - RTX 4070 (ரூ. 465,000)\n\n2 வருட உத்தியோகபூர்வ உத்தரவாதம் உண்டு. நீங்கள் எதனைப் பற்றி மேலும் அறிய விரும்புகிறீர்கள்?`;
-    }
-    return `🎮 **Top Gaming Rigs at LapMart:**\n\n1. **Acer Nitro 16 AI Gaming Rig** — AMD Ryzen 7 8845HS, 16GB DDR5, 1TB NVMe, RTX 4060 8GB (Rs. 385,000)\n2. **MSI Thin A15** — Ryzen 5 7535HS, 16GB DDR5, RTX 3050 6GB (Rs. 248,000)\n3. **ASUS ROG Strix G16** — i7 14th Gen, RTX 4070 (Rs. 465,000)\n\nAll units come factory sealed with 2 Years LapMart Comprehensive Warranty. Would you like to reserve one at your nearest showroom?`;
-  }
+  // Search real catalog by keyword
+  const matched = LAPTOP_PRODUCTS.filter((lap) => {
+    const brandMatch = q.includes(lap.brand.toLowerCase());
+    const skuMatch = q.includes(lap.sku.toLowerCase());
+    const nameMatch = lap.name.toLowerCase().split(" ").some((w) => w.length > 3 && q.includes(w));
+    const catMatch = q.includes("gaming") && lap.category === "Gaming";
+    const usedMatch = (q.includes("used") || q.includes("budget") || q.includes("cheap")) && lap.condition === "Used";
+    return brandMatch || skuMatch || nameMatch || catMatch || usedMatch;
+  });
 
-  // Budget / Used
-  if (q.includes("used") || q.includes("budget") || q.includes("cheap") || q.includes("thinkpad") || q.includes("aduma")) {
+  if (matched.length > 0) {
+    const topMatches = matched.slice(0, 3);
+    const list = topMatches.map((lap) => 
+      `• **${lap.name}** [SKU: ${lap.sku}]\n  - **Price:** Rs. ${lap.price.toLocaleString()} LKR (${lap.condition})\n  - **Specs:** ${lap.processor} | ${lap.ram} | ${lap.storage} | ${lap.graphics}\n  - **Link:** https://lapmart-v1.epixerp.com/product/${lap.slug}`
+    ).join("\n\n");
+
     if (lang === "si") {
-      return `💼 **Certified Used & Budget Workstations (Grade A+):**\n\n1. **Lenovo ThinkPad T490** - i5 8th Gen, 8GB RAM, 256GB SSD, 14\" Touch (Rs. 97,000)\n2. **HP ZBook 14 G8 Workstation** - i5 10th Gen, 8GB RAM, 256GB Turbo SSD (Rs. 121,000)\n\n45-Point Hardware පරීක්ෂාව සම්පූර්ණ කර ඇත. මාස 6ක දෘඩාංග වගකීම සහ වසර 2ක නොමිලේ සේවා වගකීමක් හිමිවේ!`;
+      return `💻 **LapMart සතුව ඇති ගැලපෙන මාදිලි:**\n\n${list}\n\n🎁 **නොමිලේ:** රු. 35,000ක් වටිනා 6-Piece VIP Gift Pack එකක් හිමිවේ!\n📍 දිවයින පුරා ශාඛා 7 කින් ලබාගත හැක. වැඩිදුර තොරතුරු සඳහා WhatsApp අමතන්න: **071 059 5548**`;
     }
-    if (lang === "ta") {
-      return `💼 **சான்றளிக்கப்பட்ட பயன்படுத்தப்பட்ட லேப்டாப்கள் (Grade A+):**\n\n1. **Lenovo ThinkPad T490** - i5 8th Gen, 8GB RAM, 256GB SSD, Touch (ரூ. 97,000)\n2. **HP ZBook 14 G8** - i5 10th Gen, 256GB SSD (ரூ. 121,000)\n\n45-Point பரிசோதிக்கப்பட்டவை. 6 மாத வன்பொருள் உத்தரவாதம் & 2 வருட இலவச சேவை வழங்கப்படுகிறது!`;
-    }
-    return `💼 **Certified Used Workstations (Grade A+ Tested):**\n\n1. **Lenovo ThinkPad T490** — Intel Core i5 8th Gen, 8GB RAM, 256GB SSD, 14\" Touch (Rs. 97,000)\n2. **HP ZBook 14 G8 Workstation** — Core i5 10th Gen, 8GB RAM, 256GB SSD (Rs. 121,000)\n\nBoth models have passed our 45-Point Hardware Diagnostics Lab and include 6 Months Hardware Warranty + 2 Years Free Service.`;
+    return `💻 **Matching Models from our Live Inventory:**\n\n${list}\n\n🎁 **Bonus:** Includes Free 6-Piece VIP Gift Pack (Value: Rs. 35,000)!\n📍 Available across our 7 physical showrooms or via Islandwide Express Delivery (24-48 hrs). WhatsApp: **071 059 5548**`;
   }
 
   // Branches
   if (q.includes("branch") || q.includes("location") || q.includes("where") || q.includes("showrooms") || q.includes("kandy") || q.includes("colombo")) {
     if (lang === "si") {
-      return `📍 **LapMart ශාඛා ජාලය (Islandwide):**\n\n• **අනුරාධපුරය (ප්‍රධාන මධ්‍යස්ථානය):** නව බස් නැවතුම්පළ ඉදිරිපිට\n• **මහනුවර (CyberHub):** පේරාදෙණිය පාර\n• **කොළඹ 04:** යුනිටි ප්ලාසා (Unity Plaza), බම්බලපිටිය\n• **කුරුණෑගල:** කොළඹ පාර\n• **බොරැල්ල:** ඩී.එස්. සේනානායක මාවත\n• **පොළොන්නරුව:** ප්‍රධාන වීදිය, කදුරුවෙල\n\nක්ෂණික ඇමතුම්: **071 059 5548**`;
+      return `📍 **LapMart ශාඛා ජාලය (දිවයින පුරා 7ක්):**\n\n• **අනුරාධපුරය (ප්‍රධාන මධ්‍යස්ථානය):** නව බස් නැවතුම්පළ\n• **මහනුවර (CyberHub Flagship):** පේරාදෙණිය පාර\n• **කොළඹ 04:** Unity Plaza, බම්බලපිටිය\n• **කුරුණෑගල:** කොළඹ පාර\n• **බොරැල්ල:** ඩී.එස්. සේනානායක මාවත\n• **මහනුවර (City Center):** දළදා වීදිය\n• **පොළොන්නරුව:** කදුරුවෙල\n\nක්ෂණික ඇමතුම්: **071 059 5548**`;
     }
-    if (lang === "ta") {
-      return `📍 **LapMart கிளைகள் (Islandwide):**\n\n• **அனுராதபுரம்:** புதிய பஸ் நிலையம் அருகில்\n• **கண்டி (CyberHub):** பேராதனை வீதி\n• **கொழும்பு 04:** Unity Plaza, பம்பலப்பிட்டி\n• **குருணாகல்:** கொழும்பு வீதி\n• **பொரளை:** டி.எஸ். சேனாநாயக்க வீதி\n\nஉடனடி தொடர்பு: **071 059 5548**`;
-    }
-    return `📍 **LapMart 7 Physical Showrooms:**\n\n• **Anuradhapura (Main Hub):** 488/11, Maithripala Senanayake Mw, New Bus Stand\n• **Kandy Flagship CyberHub:** Peradeniya Road\n• **Colombo (Bambalapitiya):** Unity Plaza 4th Floor\n• **Kurunegala:** No. 42, Colombo Road\n• **Borella (Colombo 08):** No. 18, D.S. Senanayake Mw\n• **Kandy City:** No. 65, Dalada Veediya\n• **Polonnaruwa:** Main Street, Kaduruwela\n\nOfficial Hotline: **071 059 5548**`;
+    return `📍 **LapMart 7 Physical Showrooms:**\n\n• **Anuradhapura (Main Hub):** 488/11, Maithripala Senanayake Mw, New Bus Stand\n• **Kandy Flagship CyberHub:** Peradeniya Road\n• **Colombo (Bambalapitiya):** Unity Plaza Commercial Complex\n• **Kurunegala:** No. 42, Colombo Road\n• **Borella (Colombo 08):** No. 18, D.S. Senanayake Mw\n• **Kandy City:** No. 65, Dalada Veediya\n• **Polonnaruwa:** Main Street, Kaduruwela\n\nOfficial Hotline: **071 059 5548** | WhatsApp: **+94 71 059 5548**`;
   }
 
   // General default
   if (lang === "si") {
-    return `ස්තූතියි ${customerName ? customerName + " " : ""}ඔබගේ පණිවිඩයට! LapMart AI ලෙස මට ඔබට Gaming පරිගණක, Business Ultrabooks, RAM/SSD Upgrades හෝ ශාඛා විස්තර ලබාදිය හැක. ඔබට අවශ්‍ය නිශ්චිත විස්තරය කුමක්ද? (හෝ WhatsApp මගින් 071 059 5548 අමතන්න)`;
+    return `ස්තූතියි ${customerName ? customerName + " " : ""}ඔබගේ පණිවිඩයට! LapMart AI ලෙස අප සතු ලැප්ටොප් ${LAPTOP_PRODUCTS.length} මාදිලි අතරින් Gaming, Graphic Design, Business හෝ Study සඳහා වඩාත්ම ගැළපෙන ලැප්ටොප් එක තෝරා ගැනීමට මම උදවු කරන්නම්. ඔබට අවශ්‍ය මිල පරාසය (Budget) හෝ Brand එක කුමක්ද? (WhatsApp: 071 059 5548)`;
   }
-  if (lang === "ta") {
-    return `நன்றி ${customerName ? customerName + " " : ""}உங்கள் செய்திக்கு! LapMart AI உங்களுக்கான சிறந்த லேப்டாப்கள், விலைகள் அல்லது கிளை வழிகாட்டல்களை வழங்க தயாராக உள்ளது. நீங்கள் என்ன தேடுகிறீர்கள்?`;
-  }
-  return `Thank you ${customerName ? customerName + "! " : "for messaging! "}As LapMart AI, I can help you choose the ideal laptop based on your budget, check warranty status, or arrange showroom pickup. What are you looking to accomplish today?`;
+  return `Thank you ${customerName ? customerName + "! " : "for messaging! "}As LapMart AI, I can help you find the exact laptop matching your needs from our live stock of ${LAPTOP_PRODUCTS.length} models (Brand New & Certified Used Grade A+). What is your budget or target use-case?`;
 }
 
 // Helper to log interaction to customer markdown file
@@ -161,7 +204,8 @@ export async function POST(request: NextRequest) {
           ? `Customer Name: ${name}. Mobile: ${phone}. Previous memory: ${memoryNotes || "None"}.`
           : `Mobile: ${phone || "Not provided"}.`;
 
-        const systemInstruction = `${LAPMART_SYSTEM_PROMPT}\n\n${langInstruction}\n\nCustomer Profile: ${customerContext}`;
+        const liveCatalog = buildLiveCatalogContext();
+        const systemInstruction = `${LAPMART_SYSTEM_PROMPT}\n\n${liveCatalog}\n\n${langInstruction}\n\nCustomer Profile: ${customerContext}`;
 
         // Format history for Gemini API (contents array)
         const contents = [];
